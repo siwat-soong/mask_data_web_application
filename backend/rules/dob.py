@@ -8,4 +8,4 @@ NEAR_MISS = re.compile(r"DOB:[ \t]*\d{1,2}[/.-]\d{1,2}[/.-]\d{1,4}", re.IGNORECA
 def mask(m: re.Match) -> tuple[str, int]:
     return m.group(1) + "XX/XX/" + m.group(2) + "XX", 6
 
-RULE = Rule("dob", PATTERN, mask, NEAR_MISS, priority=2)
+RULE = Rule("dob", PATTERN, mask, NEAR_MISS, priority=0)

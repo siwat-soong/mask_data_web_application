@@ -8,4 +8,4 @@ NEAR_MISS = re.compile(r"(?<![\d-])(?:\d{4} \d{4} \d{4} \d{4}|\d{13,19})(?![\d-]
 def mask(m: re.Match) -> tuple[str, int]:
     return "XXXX-XXXX-XXXX-" + m.group(1), 12
 
-RULE = Rule("credit_card", PATTERN, mask, NEAR_MISS, priority=3)
+RULE = Rule("credit_card", PATTERN, mask, NEAR_MISS, priority=0)

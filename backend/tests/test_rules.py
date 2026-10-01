@@ -89,3 +89,14 @@ def test_match_positions():
 
 def test_registry_has_all_five_types():
     assert [r.type for r in RULES] == ["credit_card", "email", "phone", "dob", "address"]
+
+
+# a card or phone can sit inside an email username; the engine keeps the higher priority
+@pytest.mark.parametrize("other, text", [
+    (credit_card.RULE, "1234-5678-9012-3456@mail.com"),
+    (phone.RULE, "093-245-7894@mail.com"),
+])
+def test_email_outranks_rules_it_can_contain(other, text):
+    assert other.pattern.search(text) is not None
+    assert email.RULE.pattern.search(text) is not None
+    assert email.RULE.priority > other.priority

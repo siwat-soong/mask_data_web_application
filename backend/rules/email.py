@@ -12,4 +12,4 @@ def mask(m: re.Match) -> tuple[str, int]:
         return user + domain, 0
     return user[0] + "*" * hidden + user[-1] + domain, hidden
 
-RULE = Rule("email", PATTERN, mask, NEAR_MISS, priority=3)
+RULE = Rule("email", PATTERN, mask, NEAR_MISS, priority=1)
