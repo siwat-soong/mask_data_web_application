@@ -11,7 +11,7 @@ def apply(rule, text):
 # (rule, input, expected output)
 SHOULD_MASK = [
     (credit_card.RULE, "1234-5678-9012-3456", "XXXX-XXXX-XXXX-3456"),
-    (credit_card.RULE, "card 1234567890123456 ok", "card XXXX-XXXX-XXXX-3456 ok"),
+    (credit_card.RULE, "card 1234-5678-9012-3456 ok", "card XXXX-XXXX-XXXX-3456 ok"),
     (email.RULE, "somchai.d@company.com", "s*******d@company.com"),
     (email.RULE, "ติดต่อ somchai.d@company.co.th.", "ติดต่อ s*******d@company.co.th."),
     (phone.RULE, "093-245-7894", "XXX-XXX-7894"),
@@ -26,6 +26,7 @@ SHOULD_MASK = [
 SHOULD_NOT_MATCH = [
     (credit_card.RULE, "1234-5678-9012-34567"),      # too many digits
     (credit_card.RULE, "1234-5678-9012"),            # only 3 groups
+    (credit_card.RULE, "1234567890123456"),          # no dashes
     (email.RULE, "somchai.d@company"),               # no dot in the domain
     (email.RULE, "@company.com"),                    # no username
     (phone.RULE, "1234-5678-9012-3456"),             # a card is not a phone
@@ -39,6 +40,7 @@ SHOULD_NOT_MATCH = [
 # (rule, input) - invalid for the valid pattern, but caught by near_miss
 NEAR_MISSES = [
     (credit_card.RULE, "1234 5678 9012 3456"),
+    (credit_card.RULE, "1234567890123456"),
     (credit_card.RULE, "123456789012345"),
     (email.RULE, "somchai.d@company"),
     (phone.RULE, "0932457894"),
