@@ -122,4 +122,4 @@ function highlight(text, errors) {
 | 413 | `FILE_TOO_LARGE` | ไฟล์ใหญ่เกิน 2 MB |
 | 415 | `UNSUPPORTED_FILE_TYPE` | ไม่ใช่ `.txt` / `.csv` |
 
-แสดง `error.message` ให้ผู้ใช้ได้เลย หรือใช้ `error.code` เลือกข้อความภาษาไทยเอง
+แสดง `error.message` ให้ผู้ใช้ได้เลย หรือใช้ `error.code` เลือกข้อความภาษาไทยเอง 
