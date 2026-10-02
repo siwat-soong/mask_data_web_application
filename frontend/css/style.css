@@ -3,64 +3,58 @@
 ========================= */
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html,
 body {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
-
 
 /* =========================
    Body
 ========================= */
 
 body {
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 
-    min-height: 100px;
-    background: #f2f7f4;
+  min-height: 100px;
+  background: #f2f7f4;
 
-    color: #333;
+  color: #333;
 }
-
 
 /* =========================
    Main App
 ========================= */
 
 .app {
-    min-height: 100vh;
-    height: 100%;
+  min-height: 100vh;
+  height: 100%;
 
-    padding: 0px 50px 0px 32px;
+  padding: 0px 50px 0px 32px;
 }
-
 
 /* =========================
    Header
 ========================= */
 
 .header {
-    display: flex;
+  display: flex;
 
-    align-items: center;
+  align-items: center;
 
-    margin-top: 11px;
-    margin-bottom: 9px;
+  margin-top: 11px;
+  margin-bottom: 9px;
 }
 
 .logo {
-    width: 160px;
+  width: 160px;
 
-    height: auto;
+  height: auto;
 
-    display: block;
+  display: block;
 }
 
 /* =========================
@@ -68,64 +62,62 @@ body {
 ========================= */
 
 .workspace {
-    width: 100%;
+  width: 100%;
 
-    min-height: calc(100vh - 100px);
-    height: 100%;
+  min-height: calc(100vh - 100px);
+  height: 100%;
 
-    display: grid;
+  display: grid;
 
-    grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
 
-    background: white;
+  background: white;
 
-    border: 1px solid #d5ddd8;
+  border: 1px solid #d5ddd8;
 
-    border-radius: 20px 20px 0px 0px;
+  border-radius: 20px 20px 0px 0px;
 
-    overflow: hidden;
+  overflow: hidden;
 
-    box-shadow:
-        0 3px 10px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
 }
 
 .data-input-wrapper {
-    position: relative;
-    width: 100%;
-    
-    box-sizing: border-box;
+  position: relative;
+  width: 100%;
+
+  box-sizing: border-box;
 }
 
-
 .clear-button {
-    position: absolute;
+  position: absolute;
 
-    top: 0;
-    right: 0;
+  top: 0;
+  right: 0;
 
-    width: 24px;
-    height: 24px;
+  width: 24px;
+  height: 24px;
 
-    display: none;
+  display: none;
 
-    align-items: center;
-    justify-content: center;
+  align-items: center;
+  justify-content: center;
 
-    padding: 0;
+  padding: 0;
 
-    border: none;
-    background: transparent;
+  border: none;
+  background: transparent;
 
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .clear-button img {
-    width: 24px;
-    height: 24px;
+  width: 24px;
+  height: 24px;
 }
 
 .clear-button:hover {
-    opacity: 0.7;
+  opacity: 0.7;
 }
 
 /* =========================
@@ -133,123 +125,132 @@ body {
 ========================= */
 
 .panel {
-    position: relative;
+  position: relative;
 
-    min-width: 0;
+  min-width: 0;
 }
 
 .original-panel {
-    border-right: 1px solid #A3B1A2;
+  border-right: 1px solid #a3b1a2;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .masked-panel {
-    background: #fff;
+  background: #fff;
 }
 
 .panel-header {
-    height: 60px;
+  height: 60px;
 
-    display: flex;
+  display: flex;
 
-    align-items: center;
+  align-items: center;
 
-    padding: 20px;
+  padding: 20px;
 
+  border-bottom: 1px solid #a3b1a2;
 
-    border-bottom: 1px solid #A3B1A2;
+  color: #2a8627;
 
-    color: #2A8627;
+  font-size: 20px;
 
-    font-size: 20px;
-
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .panel-body {
-    padding: 10px 32px 26px 32px;
+  padding: 10px 32px 26px 32px;
+}
+
+.original-panel .panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .data-input {
-    width: 100%;
-    min-height: 20px;
-    max-height: 300px;
+  width: 100%;
+  min-height: 20px;
+  max-height: 500px;
 
-    overflow-y: auto;
-    overflow-x: hidden;
+  padding-right: 32px;
 
-    border: none;
-    outline: none;
-    resize: none;
+  overflow-y: auto;
+  overflow-x: hidden;
 
-    font-family: inherit;
-    font-size: 16px;
+  border: none;
+  outline: none;
+  resize: none;
 
-    background: transparent;
-    transition: height 0.15s ease;
+  font-family: inherit;
+  font-size: 16px;
 
-    box-sizing: border-box;
+  background: transparent;
+  transition: height 0.15s ease;
 
+  box-sizing: border-box;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 /* Chrome / Edge / Safari */
 .data-input::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 .data-input::placeholder {
-    font-size: 16px;
-    color: #9C9595;
+  font-size: 16px;
+  color: #9c9595;
 }
 
 .input-actions {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-top: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 15px;
 }
 
 .action-button {
-    display: inline-flex;
+  display: inline-flex;
 
-    align-items: center;
+  align-items: center;
 
-    gap: 6px;
+  gap: 6px;
 
-    padding: 6px 14px;
+  padding: 6px 14px;
 
-    border: 1px solid #2A8627;
+  border: 1px solid #2a8627;
 
-    border-radius: 20px;
+  border-radius: 20px;
 
-    background: white;
+  background: white;
 
-    color: #2A8627;
+  color: #2a8627;
 
-    font-size: 16px;
+  font-size: 16px;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
-
-
 .action-button:hover {
-    background: #f1faf2;
+  background: #f1faf2;
 
-    transform: translateY(-1px);
+  transform: translateY(-1px);
 }
 
 .action-button span {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 .or-text {
-    color: #999;
-    font-size: 20px;
-    margin-top: 6px;
+  color: #999;
+  font-size: 20px;
+  margin-top: 6px;
 }
 
 /* =========================
@@ -257,193 +258,193 @@ body {
 ========================= */
 
 .upload-box {
-    display: none;
+  display: none;
 
-    width: 100%;
-    max-width: 300px;
+  width: 100%;
+  max-width: 250px;
 
-    height: 222px;
+  height: 180px;
 
-    margin-top: 17px;
-    padding: 18px;
+  margin-top: 17px;
+  padding: 18px;
 
-    border: 1.5px solid #4aa455;
-    border-radius: 20px;
+  border: 1.5px solid #4aa455;
+  border-radius: 20px;
 
-    background: white;
+  background: white;
 
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .upload-box.show {
-    display: block;
+  display: block;
 }
 
 .upload-inner {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 
-    padding: 15px;
-    box-sizing: border-box;
+  padding: 15px;
+  box-sizing: border-box;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-    border: 2px dashed #4aa455;
-    border-radius: 8px;
+  border: 2px dashed #4aa455;
+  border-radius: 8px;
 }
 
 .import-area {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 
-    width: 100%;
-    max-width: 300px;
+  width: 100%;
+  max-width: 250px;
+}
+
+.import-area.drag-over {
+  outline: 2px dashed #2a8627;
+  outline-offset: 6px;
+  border-radius: 20px;
+  background: #f1faf2;
 }
 
 /* import-icon */
 
 .import-icon {
-    width: 24px;
-    height: 24px;
+  width: 24px;
+  height: 24px;
 }
 
 /* paste icon */
 
 .paste-icon {
-    width: 24px;
-    height: 24px;
+  width: 24px;
+  height: 24px;
 }
 
 /* Upload Icon */
 
 .upload-icon {
-    width: 49px;
-    height: 49px;
+  width: 49px;
+  height: 49px;
 
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
-
 
 /* Main text */
 
 .upload-text {
-    max-width: 100%;
-    font-size: 15px;
-    text-align: center;
-    overflow-wrap: break-word;
+  max-width: 100%;
+  font-size: 15px;
+  text-align: center;
+  overflow-wrap: break-word;
 }
 
 .upload-text span {
-    color: #378f3e;
+  color: #378f3e;
 
-    text-decoration: underline;
+  text-decoration: underline;
 
-    cursor: pointer;
+  cursor: pointer;
 }
 
 /* Support text */
 
 .upload-support {
-    max-width: 100%;
-    text-align: center;
+  max-width: 100%;
+  text-align: center;
 }
 
 .mask-area {
-    position: absolute;
+  flex-shrink: 0;
 
-    left: 32px;
-    right: 26px;
-    bottom: 38px;
+  margin: 0 26px 38px 32px;
 
-    height: 51px;
+  height: 51px;
 
-    display: flex;
+  display: flex;
 
-    align-items: center;
+  align-items: center;
 
-    justify-content: flex-end;
+  justify-content: flex-end;
 
-    padding: 4px;
+  padding: 4px;
 
-    background: white;
+  background: white;
 
-    border-radius: 30px;
+  border-radius: 30px;
 
-    box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.25);
 }
 
 .mask-button {
-    height: 42px;
+  height: 42px;
 
-    min-width: 111px;
+  min-width: 111px;
 
-    padding: 0 22px;
+  padding: 0 22px;
 
-    border: none;
+  border: none;
 
-    border-radius: 25px;
+  border-radius: 25px;
 
-    background: #2A8627;
+  background: #2a8627;
 
-    color: white;
+  color: white;
 
-    font-size: 18px;
+  font-size: 18px;
 
-    font-weight: 600;
+  font-weight: 600;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .mask-button:hover {
-    background: #207527;
+  background: #207527;
 
-    transform: scale(1.02);
+  transform: scale(1.02);
 }
 
 .mask-button:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
 
 @media (max-width: 800px) {
+  .app {
+    padding: 20px 16px;
+  }
 
-    .app {
-        padding: 20px 16px;
-    }
+  .logo {
+    width: 140px;
+  }
 
-    .logo {
-        width: 140px;
-    }
+  .workspace {
+    grid-template-columns: 1fr;
 
-    .workspace {
-        grid-template-columns: 1fr;
+    min-height: auto;
+  }
 
-        min-height: auto;
-    }
+  .original-panel {
+    border-right: none;
 
-    .original-panel {
-        border-right: none;
+    border-bottom: 1px solid #d5ddd8;
 
-        border-bottom: 1px solid #d5ddd8;
+    min-height: 500px;
+  }
 
-        min-height: 500px;
-    }
+  .masked-panel {
+    min-height: 500px;
+  }
 
-    .masked-panel {
-        min-height: 500px;
-    }
-
-    .mask-area {
-        left: 24px;
-        right: 24px;
-        bottom: 24px;
-    }
-
+  .mask-area {
+    margin: 0 24px 24px;
+  }
 }
