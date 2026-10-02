@@ -13,6 +13,7 @@ const support_text = document.querySelector(".support-txt");
 
 const file_input = document.querySelector("#file-input");
 const browse = upload.querySelector("a");
+const mask_button = document.querySelector(".control-btn > button");
 
 
 // ========================================
@@ -220,6 +221,22 @@ clr.addEventListener("click", () => {
 
     // Trigger textarea UI update
     txt_area.dispatchEvent(new Event("input"));
+
+});
+
+// ========================================
+// Open Mask Workspace
+// ========================================
+
+mask_button.addEventListener("click", () => {
+
+    if (txt_area.value.trim() === "") {
+        alert("กรุณากรอกข้อความก่อนกด Mask");
+        return;
+    }
+
+    sessionStorage.setItem("maskInputText", txt_area.value);
+    window.location.href = "render.html";
 
 });
 
