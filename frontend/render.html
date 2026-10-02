@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>MaskData</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <main class="app">
+      <!-- Logo -->
+      <a href="index.html">
+        <header class="header">
+          <img src="img/toc_logo.svg" alt="MaskDotex" class="logo" />
+        </header>
+      </a>
+
+      <!-- Main workspace -->
+      <section class="workspace">
+        <!-- Original -->
+        <div class="panel original-panel">
+          <div class="panel-header">
+            <span>Original</span>
+          </div>
+
+          <div class="panel-body">
+            <div class="data-input-wrapper">
+              <textarea
+                id="data-input"
+                class="data-input"
+                placeholder="To mask data for PDPA, enter, paste or import file here and press “Mask”."
+              ></textarea>
+
+              <button id="clear-button" class="clear-button" type="button">
+                <img src="img/trash-2.svg" alt="Delete" />
+              </button>
+            </div>
+
+            <div class="input-actions">
+              <button class="action-button" id="paste-button">
+                <img
+                  src="img/clipboard.svg"
+                  alt="clipboard-icon"
+                  class="paste-icon"
+                />
+                <span id="paste-text">Paste</span>
+              </button>
+
+              <span class="or-text">or</span>
+
+              <div class="import-area">
+                <button class="action-button" id="import-button">
+                  <img
+                    src="img/import.svg"
+                    alt="import"
+                    class="import-icon"
+                  />
+                  Import file
+                </button>
+
+                <div class="upload-box" id="upload-box">
+                  <div class="upload-inner">
+                    <img
+                      src="img/upload.svg"
+                      alt="upload-icon"
+                      class="upload-icon"
+                    />
+
+                    <div class="upload-text">
+                      Drop File here, or
+                      <span id="browse-button">Browse</span>
+                    </div>
+
+                    <div class="upload-support">Supports: txt, csv, png</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <input type="file" id="file-input" accept=".txt,.csv,.png" hidden />
+          </div>
+
+          <div class="mask-area">
+            <button class="mask-button">Mask</button>
+          </div>
+        </div>
+
+        <!-- Masked -->
+        <div class="panel masked-panel">
+          <div class="panel-header">
+            <span>Masked</span>
+          </div>
+
+          <div class="panel-body"></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/script.js"></script>
+  </body>
+</html>
