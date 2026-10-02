@@ -1,29 +1,25 @@
-"""Engine ของ Role B: ใช้ rules จาก Role C แล้วคืนผลตามที่ Role A ใช้.
+"""
+รับ `text: str` เป็นข้อความที่ต้องการตรวจและ mask; รับ `types: list[str] | None` เป็น
+รายชื่อประเภทที่ต้องการตรวจ (`credit_card`, `email`, `phone`, `dob`, `address`). ถ้า
+`types` เป็น None จะใช้ทุกประเภท; ถ้าระบุ list จะใช้เฉพาะประเภทใน list.
 
-ข้อตกลงที่ต้องตรงกับทีม:
-- C ส่ง RULES มา โดยแต่ละ rule มี type, pattern, mask, near_miss, priority
-- A เรียก mask_text(text, types=None); ผลลัพธ์ไม่มี source เพราะ A เติมเอง
-- ตำแหน่งใช้ช่วง [start, end) และ detection มีตำแหน่งทั้งข้อความเดิมกับหลัง mask
+คืน dict ตามรูปแบบนี้:
+- `ok`: สถานะการทำงาน
+- `original_text`, `masked_text`: ข้อความก่อนและหลัง mask
+- `detections`: list ของ `{id, type, original, masked, chars_masked}`; `original` และ
+  `masked` มี `{start, end, text}`
+- `errors`: list ของ `{type, code, message, original}`; `original` มี `{start, end, text}`
+- `summary`: `{total_detections, total_chars_masked, total_errors, by_type}`; `by_type`
+  มี `{count, chars_masked, errors}` ครบทั้งห้าประเภท แม้ไม่มีข้อมูลที่พบ
+
+ตำแหน่งเป็นช่วง [start, end) ตาม index ของ string ใน Python. Response นี้ไม่มี `source`;
 """
 from backend.rules import RULES
-# from rules import RULES
 
 SUPPORTED_TYPES = ("credit_card", "email", "phone", "dob", "address")
 
 
 def mask_text(text: str, types: list[str] | None = None) -> dict:
-    """ฟังก์ชันหลักที่ Role A เรียก.
-
-    รับ text และ types (ไม่ใส่ types หมายถึงใช้ทุกประเภท) แล้วคืน dict ที่มี:
-    ok, original_text, masked_text, detections, errors, summary
-
-    detection มี id, type, original/masked {start, end, text}, chars_masked
-    error มี type, code, message และ original {start, end, text}
-    summary มี total_detections, total_chars_masked, total_errors และ by_type
-    ที่มี count, chars_masked, errors ครบทุกประเภท
-    """
-
-    # ใช้ RULES จาก C; ถ้า types เป็น None ให้ใช้ทั้งหมด
     if types is None:
         active_rules = RULES
     else:
@@ -31,20 +27,15 @@ def mask_text(text: str, types: list[str] | None = None) -> dict:
         for rule in RULES:
             if rule.type in types:
                 active_rules.append(rule)
-    # print([rule.type for rule in active_rules])
-
-    # หา matches และเลือกกรณีทับกันโดยใช้ priority
     matches = []
     for rule in active_rules:
         for match in rule.pattern.finditer(text):
             matches.append((rule, match))
-            # print(f"{rule.type} {match.group()} {match.start()} {match.end()}")
 
-    matches.sort(key=lambda pair: pair[0].priority, reverse=True) # เรียง priority มากไปน้อบ
+    matches.sort(key=lambda pair: pair[0].priority, reverse=True)
     selected_matches = []
 
     for rule, match in matches:
-        # เช็กตรงนี้ว่า match ทับกับตัวที่เลือกไว้แล้วหรือไม่
         overlap = False
         for selected_rule, selected_match in selected_matches:
             if selected_match.start() < match.end() and match.start() < selected_match.end():
@@ -53,11 +44,9 @@ def mask_text(text: str, types: list[str] | None = None) -> dict:
 
         if not overlap:
             selected_matches.append((rule, match))
-            # print(f"{rule.type} {match.group()} {match.start()} {match.end()}")
 
     selected_matches.sort(key=lambda pair: pair[1].start())
 
-    # สร้าง masked_text และ detections พร้อมตำแหน่งทั้งสองชุด
     masked_parts = []
     detections = []
     cursor = 0
@@ -91,7 +80,6 @@ def mask_text(text: str, types: list[str] | None = None) -> dict:
             },
             "chars_masked": chars_masked,
         }
-        # print(detection)
         detections.append(detection)
 
         cursor = end
@@ -99,9 +87,7 @@ def mask_text(text: str, types: list[str] | None = None) -> dict:
 
     masked_parts.append(text[cursor:])
     masked_text = "".join(masked_parts)
-    # print(masked_text)
 
-    # หา near-miss errors และสร้าง summary
     errors = []
     for rule in active_rules:
         if rule.near_miss is not None:
@@ -129,7 +115,6 @@ def mask_text(text: str, types: list[str] | None = None) -> dict:
                     }
                     errors.append(error)
 
-    # สร้าง summary
     summary = {
         "total_detections": len(detections),
         "total_chars_masked": 0,
@@ -156,60 +141,10 @@ def mask_text(text: str, types: list[str] | None = None) -> dict:
         summary["by_type"][type_name]["errors"] += 1
 
     return {
-    "ok": True,
-    "original_text": text,
-    "masked_text": masked_text,
-    "detections": detections,
-    "errors": errors,
-    "summary": summary,
+        "ok": True,
+        "original_text": text,
+        "masked_text": masked_text,
+        "detections": detections,
+        "errors": errors,
+        "summary": summary,
     }
-
-# text = """
-#             Customer 001
-#             Email: somchai@example.com
-#             Backup email: pimchanok.s@example.org
-#             Phone: 000-111-2222
-#             Alternate phone: 000-333-4444
-#             Card: 1111-2222-3333-4444
-#             Backup card: 9999-8888-7777-6666
-#             DOB: 25/12/2540
-#             DOB: 03/04/2538
-#             Address: 123/45 ถนนสุขุมวิท 17 แขวงทดสอบ
-#             Address: 678 ถนนตัวอย่าง เขตทดสอบ
-
-#             Near-miss examples
-#             Phone: 0812345678
-#             Card: 1234567890123456
-#             Email: user@example
-#             DOB: 31/13/2540
-#             Address: ถนนสุขุมวิท
-#             Customer: Somchai
-#             Credit Card: 1234-5678-9012-3456
-#             Email: somchai.d@company.com
-#             Phone: 093-245-7894
-#             DOB:25/12/2549
-#             Address: 689 ซอยลาดกระบัง 19 ถนนลาดกระบัง แขวงลาดกระบัง เขตลาดกระบัง กรุงเทพฯ
-
-#             Customer: Ananda
-#             Credit Card: 9876-5432-1098-7654
-#             Email: ananda.s@kmitl.ac.th
-#             Phone: 081-234-5678
-#             DOB:03/01/2548
-#             Address: 42 ถนนฉลองกรุง แขวงลำปลาทิว เขตลาดกระบัง กรุงเทพฯ
-
-#             Customer: Mali
-#             Credit Card: 1111-2222-3333-4444
-#             Email: mali_123@example.co.th
-#             Phone: 099-888-7766
-#             DOB:17/08/2550
-#             Address: 12/45 ซอยพหลโยธิน 34 ถนนพหลโยธิน แขวงเสนานิคม เขตจตุจักร กรุงเทพฯ
-
-#             Customer: Test User
-#             Credit Card: 5555-6666-7777-8888
-#             Email: test.user@mail.example.com
-#             Phone: 062-111-2233
-#             DOB:09/04/2547
-#             Address: 7 ถนนสุขุมวิท แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพฯ
-#         """
-
-# print(mask_text(text))
