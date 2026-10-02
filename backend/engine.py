@@ -1,148 +1,215 @@
-"""โครงงาน Role B: engine สำหรับประมวลผลข้อความตาม rules ของ Role C.
+"""Engine ของ Role B: ใช้ rules จาก Role C แล้วคืนผลตามที่ Role A ใช้.
 
-ไฟล์นี้ยังไม่มี logic ที่ใช้งานจริง ฟังก์ชันจะ raise NotImplementedError
-จนกว่าจะเติม TODO แต่ละส่วน จึงไม่คืนผลสำเร็จที่ยังไม่ได้ประมวลผล
-
-ข้อตกลงที่ต้องยืนยันกับทีม:
-- ช่วงตำแหน่งใช้ [start, end) และต้องตกลงหน่วยตำแหน่งกับ frontend
-- priority ค่าสูงหรือต่ำชนะ และกรณีเท่ากันเลือกอย่างไร
-- ความหมายของ types=[] และการรับชื่อประเภทที่ไม่รู้จัก
-- code/message ของ near-miss และวิธีตัด errors ที่ทับกับ valid matches
-
-Rule ของ C ต้องมี type, pattern, mask, near_miss และ priority ตามแผน
-ไม่ประกาศ Rule ซ้ำในไฟล์นี้ เพื่อให้ทีมใช้ interface เดียวกัน
+ข้อตกลงที่ต้องตรงกับทีม:
+- C ส่ง RULES มา โดยแต่ละ rule มี type, pattern, mask, near_miss, priority
+- A เรียก mask_text(text, types=None); ผลลัพธ์ไม่มี source เพราะ A เติมเอง
+- ตำแหน่งใช้ช่วง [start, end) และ detection มีตำแหน่งทั้งข้อความเดิมกับหลัง mask
 """
-
+from backend.rules import RULES
+# from rules import RULES
 
 SUPPORTED_TYPES = ("credit_card", "email", "phone", "dob", "address")
 
 
-def select_rules(rules: list, types: list[str] | None = None) -> list:
-    """เลือก rules ที่จะรัน; types=None หมายถึงใช้ครบทุกประเภท.
-
-    TODO: กรองด้วย rule.type และใช้ข้อตกลงของทีมสำหรับ []/ชื่อที่ไม่รู้จัก
-    ไม่แก้ไขรายการ rules หรือ types ที่ผู้เรียกส่งมา
-    """
-    raise NotImplementedError("TODO: เลือก rules ตาม types")
-
-
-def find_matches(text: str, rules: list) -> list[dict]:
-    """รวบรวม candidate matches จาก rule.pattern.finditer(text).
-
-    Candidate แต่ละรายการ:
-        {"rule": rule, "match": match, "start": int, "end": int}
-
-    เก็บ re.Match ไว้ เพราะต้องส่งให้ rule.mask(match) ภายหลัง
-    TODO: รันทุก rule และรวบรวมผล โดยยังไม่ mask หรือตัดผลทับกัน
-    """
-    raise NotImplementedError("TODO: ค้นหา candidate matches")
-
-
-def ranges_overlap(a_start: int, a_end: int, b_start: int, b_end: int) -> bool:
-    """ตรวจช่วง [start, end) สองช่วง; ช่วงที่ติดกันไม่ถือว่าทับกัน.
-
-    TODO: ใช้เงื่อนไข a_start < b_end and b_start < a_end
-    """
-    raise NotImplementedError("TODO: ตรวจช่วงที่ทับกัน")
-
-
-def resolve_overlaps(candidates: list[dict]) -> list[dict]:
-    """เลือก candidates ที่ไม่ทับกันตาม priority และเกณฑ์เสมอของทีม.
-
-    TODO: จัดลำดับผู้ชนะแล้วใช้ ranges_overlap ตรวจเทียบผลที่เลือกไว้
-    คืนรายการที่เรียงตาม start เพื่อให้ประกอบข้อความจากซ้ายไปขวาได้
-    ห้ามนับ candidate ที่ถูกตัดออกเป็น detection
-    """
-    raise NotImplementedError("TODO: เลือก matches เมื่อช่วงทับกัน")
-
-
-def build_masked_text(text: str, matches: list[dict]) -> tuple[str, list[dict]]:
-    """คืน (masked_text, detections) จาก matches ที่เลือกและเรียงแล้ว.
-
-    TODO สำหรับแต่ละ match:
-    1. ต่อข้อความต้นฉบับจาก cursor ถึง match.start()
-    2. เรียก replacement, chars_masked = rule.mask(match)
-    3. เก็บตำแหน่งเริ่มในผลลัพธ์จากความยาวที่ประกอบไปแล้ว
-    4. ต่อ replacement และสร้าง detection ตาม schema ด้านล่าง
-    5. เลื่อน cursor ของต้นฉบับไป match.end()
-    เมื่อครบแล้วต่อข้อความท้ายสุด; กรณีไม่มี match ต้องคืนข้อความเดิม
-
-    Detection:
-        {
-            "id": int, "type": str,
-            "original": {"start": int, "end": int, "text": str},
-            "masked": {"start": int, "end": int, "text": str},
-            "chars_masked": int,
-        }
-
-    จำนวน chars_masked มาจาก C ไม่ใช่ความยาว replacement
-    ตรวจว่าตัดข้อความด้วยตำแหน่งแต่ละชุดแล้วได้ text ใน detection จริง
-    """
-    raise NotImplementedError("TODO: ประกอบข้อความและเก็บตำแหน่งสองชุด")
-
-
-def find_errors(text: str, rules: list, valid_matches: list[dict]) -> list[dict]:
-    """หา near-miss ของ rules ที่เปิดใช้ และกรองรายการซ้ำตามข้อตกลง.
-
-    TODO: ข้าม rule ที่ near_miss=None; รัน finditer กับข้อความต้นฉบับ
-    ตรวจ valid_matches เพื่อไม่รายงานข้อมูลถูกต้องเป็น error ซ้ำ
-    ตกลงการตัด errors ซ้ำกัน รวมถึงแหล่ง code/message กับ C ก่อนเขียน
-    errors ไม่เปลี่ยนข้อความและไม่เพิ่มจำนวน detections
-
-    Error:
-        {
-            "type": str, "code": str, "message": str,
-            "original": {"start": int, "end": int, "text": str},
-        }
-
-    ต้องยืนยันว่า valid_matches ใช้ candidates ทั้งหมดหรือเฉพาะผู้ชนะ
-    """
-    raise NotImplementedError("TODO: รวบรวมและกรอง near-miss errors")
-
-
-def build_summary(detections: list[dict], errors: list[dict]) -> dict:
-    """รวมตัวเลขจากผลที่ใช้จริง และสร้าง by_type ครบ SUPPORTED_TYPES.
-
-    TODO: เริ่มทุกประเภทด้วย count=0, chars_masked=0, errors=0
-    จากนั้นรวม detections และ errors แยกตาม type
-
-    คืน:
-        {
-            "total_detections": int,
-            "total_chars_masked": int,
-            "total_errors": int,
-            "by_type": {
-                type_name: {"count": int, "chars_masked": int, "errors": int}
-            },
-        }
-    """
-    raise NotImplementedError("TODO: สรุปจำนวนรวมและแยกประเภท")
-
-
 def mask_text(text: str, types: list[str] | None = None) -> dict:
-    """จุดเข้า engine ที่ A เรียก; คืน response dict โดยยังไม่มี source.
+    """ฟังก์ชันหลักที่ Role A เรียก.
 
-    TODO: เมื่อ C สร้าง rules/__init__.py แล้ว import RULES จาก .rules
-    ตกลงชนิดของ RULES ให้ตรงกับ select_rules
+    รับ text และ types (ไม่ใส่ types หมายถึงใช้ทุกประเภท) แล้วคืน dict ที่มี:
+    ok, original_text, masked_text, detections, errors, summary
 
-    ลำดับเรียก:
-        selected_rules = select_rules(RULES, types)
-        candidates = find_matches(text, selected_rules)
-        matches = resolve_overlaps(candidates)
-        masked_text, detections = build_masked_text(text, matches)
-        errors = find_errors(text, selected_rules, valid_matches=...)
-        summary = build_summary(detections, errors)
+    detection มี id, type, original/masked {start, end, text}, chars_masked
+    error มี type, code, message และ original {start, end, text}
+    summary มี total_detections, total_chars_masked, total_errors และ by_type
+    ที่มี count, chars_masked, errors ครบทุกประเภท
+    """
 
-    คืน:
-        {
-            "ok": True,
-            "original_text": text,
-            "masked_text": masked_text,
-            "detections": detections,
-            "errors": errors,
-            "summary": summary,
+    # ใช้ RULES จาก C; ถ้า types เป็น None ให้ใช้ทั้งหมด
+    if types is None:
+        active_rules = RULES
+    else:
+        active_rules = []
+        for rule in RULES:
+            if rule.type in types:
+                active_rules.append(rule)
+    # print([rule.type for rule in active_rules])
+
+    # หา matches และเลือกกรณีทับกันโดยใช้ priority
+    matches = []
+    for rule in active_rules:
+        for match in rule.pattern.finditer(text):
+            matches.append((rule, match))
+            # print(f"{rule.type} {match.group()} {match.start()} {match.end()}")
+
+    matches.sort(key=lambda pair: pair[0].priority, reverse=True) # เรียง priority มากไปน้อบ
+    selected_matches = []
+
+    for rule, match in matches:
+        # เช็กตรงนี้ว่า match ทับกับตัวที่เลือกไว้แล้วหรือไม่
+        overlap = False
+        for selected_rule, selected_match in selected_matches:
+            if selected_match.start() < match.end() and match.start() < selected_match.end():
+                overlap = True
+                break
+
+        if not overlap:
+            selected_matches.append((rule, match))
+            # print(f"{rule.type} {match.group()} {match.start()} {match.end()}")
+
+    selected_matches.sort(key=lambda pair: pair[1].start())
+
+    # สร้าง masked_text และ detections พร้อมตำแหน่งทั้งสองชุด
+    masked_parts = []
+    detections = []
+    cursor = 0
+    masked_cursor = 0
+    for rule, match in selected_matches:
+        start = match.start()
+        end = match.end()
+        original = match.group()
+
+        unchanged = text[cursor:start]
+        masked_parts.append(unchanged)
+        masked_cursor += len(unchanged)
+
+        replacement, chars_masked = rule.mask(match)
+        masked_start = masked_cursor
+        masked_end = masked_start + len(replacement)
+
+        masked_parts.append(replacement)
+        detection = {
+            "id": len(detections),
+            "type": rule.type,
+            "original": {
+                "start": start,
+                "end": end,
+                "text": original,
+            },
+            "masked": {
+                "start": masked_start,
+                "end": masked_end,
+                "text": replacement,
+            },
+            "chars_masked": chars_masked,
+        }
+        # print(detection)
+        detections.append(detection)
+
+        cursor = end
+        masked_cursor = masked_end
+
+    masked_parts.append(text[cursor:])
+    masked_text = "".join(masked_parts)
+    # print(masked_text)
+
+    # หา near-miss errors และสร้าง summary
+    errors = []
+    for rule in active_rules:
+        if rule.near_miss is not None:
+            for near_match in rule.near_miss.finditer(text):
+                overlap = False
+
+                for detection in detections:
+                    original_start = detection["original"]["start"]
+                    original_end = detection["original"]["end"]
+
+                    if original_start < near_match.end() and near_match.start() < original_end:
+                        overlap = True
+                        break
+
+                if not overlap:
+                    error = {
+                        "type": rule.type,
+                        "code": "INVALID_FORMAT",
+                        "message": f"Possible {rule.type} has an invalid format.",
+                        "original": {
+                            "start": near_match.start(),
+                            "end": near_match.end(),
+                            "text": near_match.group(),
+                        },
+                    }
+                    errors.append(error)
+
+    # สร้าง summary
+    summary = {
+        "total_detections": len(detections),
+        "total_chars_masked": 0,
+        "total_errors": len(errors),
+        "by_type": {},
+    }
+
+    for type_name in SUPPORTED_TYPES:
+        summary["by_type"][type_name] = {
+            "count": 0,
+            "chars_masked": 0,
+            "errors": 0,
         }
 
-    A รับผิดชอบ source, ตรวจ request/ไฟล์ และ HTTP response
-    """
-    raise NotImplementedError("TODO: เชื่อมขั้นตอนของ engine")
+    for detection in detections:
+        type_name = detection["type"]
+
+        summary["total_chars_masked"] += detection["chars_masked"]
+        summary["by_type"][type_name]["count"] += 1
+        summary["by_type"][type_name]["chars_masked"] += detection["chars_masked"]
+
+    for error in errors:
+        type_name = error["type"]
+        summary["by_type"][type_name]["errors"] += 1
+
+    return {
+    "ok": True,
+    "original_text": text,
+    "masked_text": masked_text,
+    "detections": detections,
+    "errors": errors,
+    "summary": summary,
+    }
+
+# text = """
+#             Customer 001
+#             Email: somchai@example.com
+#             Backup email: pimchanok.s@example.org
+#             Phone: 000-111-2222
+#             Alternate phone: 000-333-4444
+#             Card: 1111-2222-3333-4444
+#             Backup card: 9999-8888-7777-6666
+#             DOB: 25/12/2540
+#             DOB: 03/04/2538
+#             Address: 123/45 ถนนสุขุมวิท 17 แขวงทดสอบ
+#             Address: 678 ถนนตัวอย่าง เขตทดสอบ
+
+#             Near-miss examples
+#             Phone: 0812345678
+#             Card: 1234567890123456
+#             Email: user@example
+#             DOB: 31/13/2540
+#             Address: ถนนสุขุมวิท
+#             Customer: Somchai
+#             Credit Card: 1234-5678-9012-3456
+#             Email: somchai.d@company.com
+#             Phone: 093-245-7894
+#             DOB:25/12/2549
+#             Address: 689 ซอยลาดกระบัง 19 ถนนลาดกระบัง แขวงลาดกระบัง เขตลาดกระบัง กรุงเทพฯ
+
+#             Customer: Ananda
+#             Credit Card: 9876-5432-1098-7654
+#             Email: ananda.s@kmitl.ac.th
+#             Phone: 081-234-5678
+#             DOB:03/01/2548
+#             Address: 42 ถนนฉลองกรุง แขวงลำปลาทิว เขตลาดกระบัง กรุงเทพฯ
+
+#             Customer: Mali
+#             Credit Card: 1111-2222-3333-4444
+#             Email: mali_123@example.co.th
+#             Phone: 099-888-7766
+#             DOB:17/08/2550
+#             Address: 12/45 ซอยพหลโยธิน 34 ถนนพหลโยธิน แขวงเสนานิคม เขตจตุจักร กรุงเทพฯ
+
+#             Customer: Test User
+#             Credit Card: 5555-6666-7777-8888
+#             Email: test.user@mail.example.com
+#             Phone: 062-111-2233
+#             DOB:09/04/2547
+#             Address: 7 ถนนสุขุมวิท แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพฯ
+#         """
+
+# print(mask_text(text))
