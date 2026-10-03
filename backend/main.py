@@ -6,6 +6,7 @@ Then open http://127.0.0.1:8000/docs to try the API.
 import os
 
 from fastapi import FastAPI, File, Form, Request, UploadFile
+from fastapi.concurrency import run_in_threadpool
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -29,9 +30,12 @@ app.add_middleware(
 )
 
 ERROR_RESPONSES = {
-    400: {"model": ErrorResponse, "description": "Empty text, bad `types`, or undecodable file"},
-    413: {"model": ErrorResponse, "description": "Text or file too large"},
+    400: {"model": ErrorResponse, "description": "Empty text, bad `types`, undecodable file, bad image, or no text in image"},
+    413: {"model": ErrorResponse, "description": "Text, file or image too large"},
     415: {"model": ErrorResponse, "description": "Unsupported file type"},
+    500: {"model": ErrorResponse, "description": "Tesseract failed to read the image"},
+    503: {"model": ErrorResponse, "description": "Tesseract or its Thai data is not installed"},
+    504: {"model": ErrorResponse, "description": "OCR took too long"},
 }
 
 
@@ -86,6 +90,7 @@ def mask(body: MaskRequest) -> dict:
 @app.post("/api/mask/file", response_model=MaskResponse, responses=ERROR_RESPONSES)
 async def mask_file(file: UploadFile = File(...), types: list[str] | None = Form(None)) -> dict:
     data = await file.read(MAX_FILE_BYTES + 1)  # one extra byte is enough to detect "too large"
-    text, file_type = read_upload(file.filename, data)
-    source = {"kind": "file", "filename": file.filename, "file_type": file_type, "ocr": False}
+    # OCR can take seconds, so run it off the event loop to keep other requests responsive
+    text, file_type = await run_in_threadpool(read_upload, file.filename, data)
+    source = {"kind": "file", "filename": file.filename, "file_type": file_type, "ocr": file_type == "png"}
     return run_mask(text, types, source)
