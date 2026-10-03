@@ -14,9 +14,23 @@
 
 ตำแหน่งเป็นช่วง [start, end) ตาม index ของ string ใน Python. Response นี้ไม่มี `source`;
 """
+from bisect import bisect_right
+
 from backend.rules import RULES
 
 SUPPORTED_TYPES = ("credit_card", "email", "phone", "dob", "address")
+
+
+def overlaps_any(starts: list[int], ends: list[int], start: int, end: int) -> bool:
+    """Check [start, end) against ranges sorted by start that do not overlap each other.
+
+    Because the ranges never overlap, only the two neighbours of `start` can touch it,
+    so a binary search replaces a loop over every range.
+    """
+    i = bisect_right(starts, start)
+    if i > 0 and ends[i - 1] > start:
+        return True
+    return i < len(starts) and starts[i] < end
 
 
 def mask_text(text: str, types: list[str] | None = None) -> dict:
@@ -34,18 +48,15 @@ def mask_text(text: str, types: list[str] | None = None) -> dict:
 
     matches.sort(key=lambda pair: pair[0].priority, reverse=True)
     selected_matches = []
+    selected_starts = []
+    selected_ends = []
 
     for rule, match in matches:
-        overlap = False
-        for selected_rule, selected_match in selected_matches:
-            if selected_match.start() < match.end() and match.start() < selected_match.end():
-                overlap = True
-                break
-
-        if not overlap:
-            selected_matches.append((rule, match))
-
-    selected_matches.sort(key=lambda pair: pair[1].start())
+        if not overlaps_any(selected_starts, selected_ends, match.start(), match.end()):
+            i = bisect_right(selected_starts, match.start())
+            selected_starts.insert(i, match.start())
+            selected_ends.insert(i, match.end())
+            selected_matches.insert(i, (rule, match))
 
     masked_parts = []
     detections = []
@@ -92,17 +103,7 @@ def mask_text(text: str, types: list[str] | None = None) -> dict:
     for rule in active_rules:
         if rule.near_miss is not None:
             for near_match in rule.near_miss.finditer(text):
-                overlap = False
-
-                for detection in detections:
-                    original_start = detection["original"]["start"]
-                    original_end = detection["original"]["end"]
-
-                    if original_start < near_match.end() and near_match.start() < original_end:
-                        overlap = True
-                        break
-
-                if not overlap:
+                if not overlaps_any(selected_starts, selected_ends, near_match.start(), near_match.end()):
                     error = {
                         "type": rule.type,
                         "code": "INVALID_FORMAT",
