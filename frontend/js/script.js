@@ -271,6 +271,14 @@ clearButton.addEventListener("click", () => {
 
 maskButton.addEventListener("click", submitMask);
 
+const savedInputText = sessionStorage.getItem("maskInputText");
+
+if (savedInputText !== null) {
+  dataInput.value = savedInputText;
+  dataInput.dispatchEvent(new Event("input"));
+  sessionStorage.removeItem("maskInputText");
+}
+
 const savedResult = loadMaskResult();
 if (savedResult) renderMaskedResult(savedResult);
 

@@ -9,6 +9,7 @@ const supportText = document.querySelector(".support-txt");
 const fileInput = document.querySelector("#file-input");
 const browse = upload.querySelector("a");
 const maskButton = document.querySelector(".control-btn > button");
+const expandButton = document.querySelector(".bi-arrows-angle-expand").closest("a");
 let selectedFile = null;
 let fillingFilePreview = false;
 
@@ -146,4 +147,14 @@ upload.addEventListener("drop", (event) => {
   transfer.items.add(file);
   fileInput.files = transfer.files;
   fileInput.dispatchEvent(new Event("change"));
+});
+
+expandButton.addEventListener("click", () => {
+  const text = txtArea.value;
+
+  if (text.trim()) {
+    sessionStorage.setItem("maskInputText", text);
+  } else {
+    sessionStorage.removeItem("maskInputText");
+  }
 });
