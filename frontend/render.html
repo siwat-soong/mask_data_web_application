@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>MaskData</title>
-
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
     <link rel="stylesheet" href="css/style.css" />
   </head>
 
@@ -54,11 +57,7 @@
 
               <div class="import-area">
                 <button class="action-button" id="import-button">
-                  <img
-                    src="img/import.svg"
-                    alt="import"
-                    class="import-icon"
-                  />
+                  <img src="img/import.svg" alt="import" class="import-icon" />
                   Import file
                 </button>
 
@@ -75,31 +74,76 @@
                       <span id="browse-button">Browse</span>
                     </div>
 
-                    <div class="upload-support">Supports: txt, csv, png</div>
+                    <div class="upload-support">Supports: txt, csv</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <input type="file" id="file-input" accept=".txt,.csv,.png" hidden />
+            <input type="file" id="file-input" accept=".txt,.csv" hidden />
           </div>
 
           <div class="mask-area">
+            <div id="mask-summary" class="mask-summary" aria-live="polite">
+              ยังไม่มีผลการตรวจสอบ
+            </div>
             <button class="mask-button">Mask</button>
           </div>
         </div>
 
         <!-- Masked -->
         <div class="panel masked-panel">
+          <div id="error-tooltip" class="error-tooltip" role="tooltip" hidden></div>
           <div class="panel-header">
             <span>Masked</span>
           </div>
 
-          <div class="panel-body"></div>
+          <button
+            id="copy-masked-button"
+            class="copy-action"
+            type="button"
+            hidden
+          >
+            <i class="bi bi-copy" id="copy-button"></i>
+          </button>
+
+          <div
+            class="panel-body masked-output"
+            id="masked-output"
+            aria-live="polite"
+          >
+            <p class="empty-output"></p>
+          </div>
+
+          <div class="download-group">
+
+            <div id="download-menu" class="download-menu" hidden>
+              <button class="download-option" id="download-txt" type="button">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>TXT</span>
+              </button>
+
+              <button class="download-option" id="download-csv" type="button">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                <span>CSV</span>
+              </button>
+            </div>
+
+            <button
+              id="download-masked-button"
+              class="masked-action download-action"
+              type="button"
+              hidden
+            >
+              <i class="bi bi-download"></i>
+            </button>
+          </div>
+
         </div>
       </section>
     </main>
 
+    <script src="js/api.js"></script>
     <script src="js/script.js"></script>
   </body>
 </html>
