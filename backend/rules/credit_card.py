@@ -3,7 +3,7 @@ import re
 from .base import Rule
 
 PATTERN = re.compile(r"(?<![\d-])(?:\d{4}-){3}(\d{4})(?![\d-])")
-NEAR_MISS = re.compile(r"(?<![\d-])(?:\d{4} \d{4} \d{4} \d{4}|\d{13,19})(?![\d-])")   # spaces, no dashes, or wrong digit count
+NEAR_MISS = re.compile(r"(?<![\d-])(?:\d{4} \d{4} \d{4} \d{4}|\d{16})(?![\d-])")   # spaces instead of dashes, or no separators
 
 def mask(m: re.Match) -> tuple[str, int]:
     return "XXXX-XXXX-XXXX-" + m.group(1), 12

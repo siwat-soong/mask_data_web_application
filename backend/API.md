@@ -11,9 +11,6 @@ uvicorn backend.main:app --reload
 - ลองยิง API ได้ที่ `http://127.0.0.1:8000/docs`
 - CORS: ค่าเริ่มต้นอนุญาตทุก origin (`*`) สำหรับ dev; ตอน deploy ให้ตั้ง `CORS_ORIGINS="https://frontend.example.com"` (คั่นหลายค่าด้วย comma)
 
-> ตอนนี้ถ้ายังไม่มี `backend/engine.py` (ของ Role B) API จะตอบ **ตัวอย่างแบบ hard-code** เสมอ ไม่ว่าส่งอะไรไป
-> โครงสร้าง JSON เหมือนของจริงทุกอย่าง ใช้ทำหน้าแสดงผลได้เลย
-
 ## Endpoints
 
 | Method | Path | Body | ใช้กับ |
@@ -85,6 +82,7 @@ const res2 = await fetch("http://127.0.0.1:8000/api/mask/file", { method: "POST"
 - `source.kind` เป็น `"text"` สำหรับ `/api/mask` (`filename`, `file_type` เป็น `null`)
 - `start`/`end` เป็นช่วง `[start, end)` ตาม index ของตัวอักษร ใช้ `str.slice(start, end)` ใน JS ได้ตรงๆ
   - `original.*` ชี้ใน `original_text`, `masked.*` ชี้ใน `masked_text`
+  - ข้อยกเว้น: emoji และอักขระพิเศษบางตัว Python นับเป็น 1 ตัว แต่ JS นับเป็น 2 ตัว ถ้าข้อความมี emoji ตำแหน่งหลังจากนั้นใน JS จะเลื่อนไป 1 ต่อ emoji 1 ตัว (ภาษาไทยและภาษาอังกฤษปกติไม่มีปัญหา) ถ้าต้องการให้ตรงเสมอ ให้ใช้ `Array.from(text).slice(start, end).join("")` แทน `text.slice(start, end)`
   - การ mask ทุกแบบให้ความยาวเท่าเดิม (เช่น `093-245-7894` → `XXX-XXX-7894`) ดังนั้น `original_text` กับ `masked_text` ยาวเท่ากัน และตำแหน่งตรงกันทุกตัวอักษร
 - `errors` = ข้อมูลที่ดูเหมือนข้อมูลส่วนบุคคลแต่รูปแบบผิด **ไม่ถูก mask** แค่แจ้งตำแหน่ง
   - ใช้ `errors[].original.start` / `end` ไฮไลท์ได้ทั้งบน `original_text` และ `masked_text` (เพราะตำแหน่งตรงกัน)

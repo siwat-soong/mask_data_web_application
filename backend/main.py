@@ -10,16 +10,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from backend.engine import mask_text
 from backend.files import MAX_FILE_BYTES, APIError, read_upload
 from backend.schemas import SUPPORTED_TYPES, ErrorResponse, MaskRequest, MaskResponse
-
-try:
-    from backend.engine import mask_text
-except ModuleNotFoundError as exc:
-    # Role B's engine is not on this branch yet: serve the hard-coded example.
-    if exc.name != "backend.engine":
-        raise
-    from backend.sample_engine import mask_text
 
 MAX_TEXT_CHARS = MAX_FILE_BYTES  # same budget as a file upload
 

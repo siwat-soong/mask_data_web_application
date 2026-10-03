@@ -37,11 +37,18 @@ SHOULD_NOT_MATCH = [
     (address.RULE, "ซอยลาดกระบัง 19"),                # no Address: label
 ]
 
+# (rule, input) - neither pattern may fire: long numbers that are not cards
+NOT_A_CARD = [
+    "1234567890123",          # 13 digits, e.g. a Thai national ID
+    "order 12345678901234",   # 14-digit order number
+    "123456789012345",        # 15 digits
+    "12345678901234567",      # 17 digits
+]
+
 # (rule, input) - invalid for the valid pattern, but caught by near_miss
 NEAR_MISSES = [
     (credit_card.RULE, "1234 5678 9012 3456"),
     (credit_card.RULE, "1234567890123456"),
-    (credit_card.RULE, "123456789012345"),
     (email.RULE, "somchai.d@company"),
     (phone.RULE, "0932457894"),
     (dob.RULE, "DOB:25/13/2549"),
@@ -60,6 +67,12 @@ def test_should_mask(rule, text, expected):
 @pytest.mark.parametrize("rule, text", SHOULD_NOT_MATCH)
 def test_should_not_match(rule, text):
     assert rule.pattern.search(text) is None
+
+
+@pytest.mark.parametrize("text", NOT_A_CARD)
+def test_long_numbers_are_not_card_errors(text):
+    assert credit_card.RULE.pattern.search(text) is None
+    assert credit_card.RULE.near_miss.search(text) is None
 
 
 @pytest.mark.parametrize("rule, text", NEAR_MISSES)
