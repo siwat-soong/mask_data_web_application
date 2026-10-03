@@ -7,6 +7,16 @@ pip install -r backend/requirements.txt
 uvicorn backend.main:app --reload
 ```
 
+หรือรันด้วย Docker (ติดตั้ง Tesseract ภาษาไทยไว้ให้แล้ว ใช้ตัวนี้ตอน deploy ได้เลย) รันจาก root ของ repo:
+
+```
+docker build -t maskdata .
+docker run --rm -p 8000:8000 maskdata
+```
+
+- ถ้า hosting ส่ง port มาทาง `$PORT` ตัว image จะใช้ port นั้นเอง (ไม่มีก็ใช้ 8000)
+- รัน test ทั้งหมดใน Docker (รวม test OCR จริง): `docker build --target test -t maskdata-test .` แล้ว `docker run --rm maskdata-test`
+
 - อ่านไฟล์ `.png` ได้ต้องติดตั้งโปรแกรม Tesseract พร้อมภาษาไทยด้วย (แค่ `pip install` ไม่พอ)
   - Windows: ตัวติดตั้งจาก https://github.com/UB-Mannheim/tesseract/wiki ตอนติดตั้งให้ติ๊ก Thai ใน "Additional language data"
   - Linux (Debian/Ubuntu): `apt install tesseract-ocr tesseract-ocr-tha`

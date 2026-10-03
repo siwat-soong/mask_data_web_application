@@ -26,6 +26,15 @@ DASHES = re.compile(r"[\u2010-\u2015\u2212]")  # hyphen, en dash, em dash, minus
 SPACED_DASH = re.compile(r"(?<=\d)[ \t]*-[ \t]*(?=\d)")  # "093 - 245" -> "093-245"
 SPACE_BEFORE_COLON = re.compile(r"[ \t]+:")  # "DOB :" -> "DOB:"
 
+# OCR sometimes splits a digit group with a space ("1234-5678-90 12-3456"). Spaces are removed
+# only when the result is exactly a card, phone or date shape, so separate numbers stay apart.
+_D2, _D3, _D4 = (r"\d(?: ?\d){%d}" % (n - 1) for n in (2, 3, 4))  # n digits, a space allowed between any two
+GAPPED_NUMBERS = [
+    re.compile(rf"(?<![\d-]){_D4}-{_D4}-{_D4}-{_D4}(?![\d-])"),  # card
+    re.compile(rf"(?<![\d-]){_D3}-{_D3}-{_D4}(?![\d-])"),        # phone
+    re.compile(rf"(?<![\d/]){_D2}/{_D2}/{_D4}(?![\d/])"),         # date
+]
+
 
 def find_tesseract() -> str | None:
     cmd = os.getenv("TESSERACT_CMD") or shutil.which("tesseract")
@@ -70,6 +79,8 @@ def clean_ocr_text(text: str) -> str:
     text = text.replace("\r\n", "\n").replace("\f", "")
     text = DASHES.sub("-", text)
     text = SPACED_DASH.sub("-", text)
+    for pattern in GAPPED_NUMBERS:
+        text = pattern.sub(lambda m: m.group().replace(" ", ""), text)
     text = SPACE_BEFORE_COLON.sub(":", text)
     return text.strip()
 

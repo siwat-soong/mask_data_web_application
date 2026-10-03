@@ -13,7 +13,12 @@ from backend import main, ocr
 
 client = TestClient(main.app)
 
-THAI_FONT = r"C:\Windows\Fonts\tahoma.ttf"  # has Thai glyphs; used only by the real Thai test
+# Fonts with Thai glyphs, used only to draw the real Thai test image
+THAI_FONTS = [
+    r"C:\Windows\Fonts\tahoma.ttf",
+    "/usr/share/fonts/truetype/tlwg/Garuda.ttf",  # Debian package fonts-tlwg-garuda-ttf (Docker test image)
+]
+THAI_FONT = next((path for path in THAI_FONTS if os.path.exists(path)), None)
 
 
 def png_bytes(image: Image.Image) -> bytes:
@@ -133,6 +138,12 @@ def test_small_images_are_enlarged_large_ones_are_not():
     ("Address :  689", "Address:  689"),
     ("line1\r\nline2\f", "line1\nline2"),
     ("pre - fix stays", "pre - fix stays"),   # only dashes between digits are joined
+    ("1234-5678-90 12-3456", "1234-5678-9012-3456"),
+    ("09 3-245-78 94", "093-245-7894"),
+    ("DOB:25/12/25 49", "DOB:25/12/2549"),
+    ("1234 5678 9012 3456", "1234 5678 9012 3456"),   # no dashes: not a card shape, left for the near-miss
+    ("id 12 093-245-7894", "id 12 093-245-7894"),     # a separate number before a phone stays separate
+    ("12 34-56", "12 34-56"),                         # joining would not give a full shape
 ])
 def test_clean_ocr_text(raw, cleaned):
     assert ocr.clean_ocr_text(raw) == cleaned
@@ -172,7 +183,7 @@ def test_real_ocr_english_screenshot():
 
 
 @needs_tesseract
-@pytest.mark.skipif(not os.path.exists(THAI_FONT), reason="no Thai font to draw the test image")
+@pytest.mark.skipif(THAI_FONT is None, reason="no Thai font to draw the test image")
 def test_real_ocr_thai_address():
     data = text_png(["Address: 689 ถนนลาดกระบัง กรุงเทพฯ"], font=ImageFont.truetype(THAI_FONT, 40))
     body = upload_png(data).json()
