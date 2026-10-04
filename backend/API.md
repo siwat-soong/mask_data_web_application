@@ -7,6 +7,21 @@ pip install -r backend/requirements.txt
 uvicorn backend.main:app --reload
 ```
 
+หรือรันด้วย Docker (ติดตั้ง Tesseract ภาษาไทยไว้ให้แล้ว ใช้ตัวนี้ตอน deploy ได้เลย) รันจาก root ของ repo:
+
+```
+docker build -t maskdata .
+docker run --rm -p 8000:8000 maskdata
+```
+
+- ถ้า hosting ส่ง port มาทาง `$PORT` ตัว image จะใช้ port นั้นเอง (ไม่มีก็ใช้ 8000)
+- รัน test ทั้งหมดใน Docker (รวม test OCR จริง): `docker build --target test -t maskdata-test .` แล้ว `docker run --rm maskdata-test`
+
+- อ่านไฟล์ `.png` ได้ต้องติดตั้งโปรแกรม Tesseract พร้อมภาษาไทยด้วย (แค่ `pip install` ไม่พอ)
+  - Windows: ตัวติดตั้งจาก https://github.com/UB-Mannheim/tesseract/wiki ตอนติดตั้งให้ติ๊ก Thai ใน "Additional language data"
+  - Linux (Debian/Ubuntu): `apt install tesseract-ocr tesseract-ocr-tha`
+  - ถ้า `tesseract` ไม่อยู่ใน PATH ให้ตั้ง `TESSERACT_CMD` เป็น path เต็มของโปรแกรม
+  - ถ้าไม่ได้ติดตั้ง ไฟล์ `.txt` / `.csv` ยังใช้ได้ปกติ แต่ `.png` จะตอบ 503
 - Base URL ตอน dev: `http://127.0.0.1:8000`
 - ลองยิง API ได้ที่ `http://127.0.0.1:8000/docs`
 - CORS: ค่าเริ่มต้นอนุญาตทุก origin (`*`) สำหรับ dev; ตอน deploy ให้ตั้ง `CORS_ORIGINS="https://frontend.example.com"` (คั่นหลายค่าด้วย comma)
@@ -22,9 +37,15 @@ uvicorn backend.main:app --reload
 `types` ไม่ใส่ = ตรวจครบทั้ง 5 ประเภท: `credit_card`, `email`, `phone`, `dob`, `address`
 ส่ง `[]` = ไม่ตรวจอะไรเลย (ได้ข้อความเดิมกลับมา)
 
-ไฟล์: รับ `.txt` และ `.csv` ขนาดไม่เกิน 2 MB, encoding UTF-8 (มี BOM ได้) หรือ Windows Thai (cp874)
-บรรทัดใหม่ทุกแบบถูกแปลงเป็น `\n` ก่อนตรวจ ดังนั้นตำแหน่ง start/end อ้างอิงกับ `original_text` ที่ส่งกลับไป (ไม่ใช่ไฟล์ดิบ)
-`.png` ยังไม่รองรับ (ตอบ 415)
+ไฟล์: รับ `.txt`, `.csv` และ `.png` ขนาดไม่เกิน 2 MB
+- `.txt` / `.csv`: encoding UTF-8 (มี BOM ได้) หรือ Windows Thai (cp874) บรรทัดใหม่ทุกแบบถูกแปลงเป็น `\n` ก่อนตรวจ
+- `.png`: อ่านข้อความจากรูปด้วย OCR (Tesseract, ภาษาไทย + อังกฤษ) แล้วตรวจเหมือนข้อความปกติ response จะมี `source.ocr = true`
+  - รูปต้องไม่เกิน 25 ล้าน pixel (ประมาณ 5000 × 5000) และอ่านได้ภายใน 30 วินาที
+  - OCR อ่านผิดได้ (เช่น `0` กับ `O`) ข้อมูลบางส่วนอาจไม่ถูกตรวจเจอ
+  - หลัง OCR ระบบแก้ข้อผิดพลาดที่เจอบ่อยให้ก่อน: ขีดยาว (`–`, `—`) เป็น `-`, ช่องว่างรอบขีดระหว่างตัวเลข (`093 - 245`) และช่องว่างก่อน `:` (`DOB :`)
+  - browser อ่านข้อความจากรูปเองไม่ได้ frontend ต้องเอา `original_text` จาก response ไปแสดงเป็นข้อความต้นฉบับ
+
+ตำแหน่ง start/end ทั้งหมดอ้างอิงกับ `original_text` ที่ส่งกลับไป (ไม่ใช่ไฟล์ดิบหรือรูป)
 
 ### ตัวอย่างการเรียกจาก JS
 
@@ -116,8 +137,14 @@ function highlight(text, errors) {
 | 400 | `INVALID_TYPES` | `types` มีชื่อที่ไม่รู้จัก |
 | 400 | `INVALID_REQUEST` | body ผิดรูปแบบ, ไม่มี `text`, ไม่มี `file` |
 | 400 | `DECODE_FAILED` | ไฟล์อ่านเป็นข้อความไม่ได้ |
+| 400 | `INVALID_IMAGE` | ไฟล์ `.png` ไม่ใช่รูป PNG จริง หรือไฟล์เสีย |
+| 400 | `NO_TEXT_FOUND` | OCR ไม่เจอข้อความในรูป |
 | 413 | `TEXT_TOO_LARGE` | ข้อความยาวเกิน 2,097,152 ตัวอักษร |
 | 413 | `FILE_TOO_LARGE` | ไฟล์ใหญ่เกิน 2 MB |
-| 415 | `UNSUPPORTED_FILE_TYPE` | ไม่ใช่ `.txt` / `.csv` |
+| 413 | `IMAGE_TOO_LARGE` | รูปเกิน 25 ล้าน pixel |
+| 415 | `UNSUPPORTED_FILE_TYPE` | ไม่ใช่ `.txt` / `.csv` / `.png` |
+| 500 | `OCR_FAILED` | Tesseract อ่านรูปไม่สำเร็จ |
+| 503 | `OCR_UNAVAILABLE` | server ไม่ได้ติดตั้ง Tesseract หรือข้อมูลภาษาไทยของ Tesseract |
+| 504 | `OCR_TIMEOUT` | อ่านรูปนานเกิน 30 วินาที |
 
 แสดง `error.message` ให้ผู้ใช้ได้เลย หรือใช้ `error.code` เลือกข้อความภาษาไทยเอง 

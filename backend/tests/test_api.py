@@ -113,7 +113,7 @@ def test_file_unknown_type(engine):
     assert_error(upload("a.txt", b"hi", types=["nope"]), 400, "INVALID_TYPES")
 
 
-@pytest.mark.parametrize("name", ["photo.png", "doc.pdf", "noextension"])
+@pytest.mark.parametrize("name", ["photo.jpg", "doc.pdf", "noextension"])
 def test_file_wrong_extension(engine, name):
     assert_error(upload(name, b"hi"), 415, "UNSUPPORTED_FILE_TYPE")
 

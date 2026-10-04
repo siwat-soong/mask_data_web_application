@@ -1,8 +1,8 @@
-"""Upload validation and text decoding for POST /api/mask/file."""
+"""Upload validation and text decoding for POST /api/mask/file (PNG goes to backend/ocr.py)."""
 import os
 
 MAX_FILE_BYTES = 2 * 1024 * 1024  # 2 MB
-ALLOWED_EXTENSIONS = {".txt", ".csv"}  # .png comes later with OCR
+ALLOWED_EXTENSIONS = {".txt", ".csv", ".png"}
 ENCODINGS = ("utf-8-sig", "cp874")  # cp874 = Thai Windows files
 
 
@@ -47,4 +47,7 @@ def read_upload(filename: str | None, data: bytes) -> tuple[str, str]:
     """Validate an uploaded file and return (text, file_type)."""
     file_type = file_type_of(filename)
     check_size(data)
+    if file_type == "png":
+        from backend.ocr import image_to_text  # imported here so txt/csv keep working without the OCR packages
+        return image_to_text(data), file_type
     return decode_text(data), file_type
