@@ -110,16 +110,18 @@ fileInput.addEventListener("change", () => {
 
   if (extension === ".png") {
     txtArea.value = "";
-    txtArea.placeholder =
-      `เลือกไฟล์ภาพ "${file.name}" แล้ว กด Mask เพื่ออ่านข้อความจากรูป`;
+    txtArea.placeholder = `เลือกไฟล์ภาพ "${file.name}" แล้ว กด Mask เพื่ออ่านข้อความจากรูป`;
+    txtArea.classList.add("png-selected");
     updateInputState();
     return;
   }
-
+  
+  txtArea.classList.remove("png-selected");
   reader.readAsText(file, "UTF-8");
 });
 
 txtArea.addEventListener("input", () => {
+  txtArea.classList.remove("png-selected");
   if (txtArea.value.trim())
     txtArea.placeholder =
       "To mask data for PDPA, enter, paste or import file here and press “Mask”.";
@@ -136,6 +138,7 @@ pasteButton.addEventListener("click", async () => {
 });
 
 clearIcon.addEventListener("click", () => {
+  txtArea.classList.remove("png-selected");
   txtArea.value = "";
   selectedFile = null;
   fileInput.value = "";

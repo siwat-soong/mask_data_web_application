@@ -191,6 +191,16 @@ body {
     cursor: pointer;
 }
 
+.text-input.png-selected::placeholder,
+.data-input.png-selected::placeholder {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: normal;
+  color: #040404;
+}
+
 .hidden {
     visibility: hidden;
 }
