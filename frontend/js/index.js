@@ -9,7 +9,9 @@ const supportText = document.querySelector(".support-txt");
 const fileInput = document.querySelector("#file-input");
 const browse = upload.querySelector("a");
 const maskButton = document.querySelector(".control-btn > button");
-const expandButton = document.querySelector(".bi-arrows-angle-expand").closest("a");
+const expandButton = document
+  .querySelector(".bi-arrows-angle-expand")
+  .closest("a");
 let selectedFile = null;
 let fillingFilePreview = false;
 
@@ -20,12 +22,19 @@ function updateInputState() {
   if (hasText && !fillingFilePreview) selectedFile = null;
 }
 
-function showUploadPanel(button, accept = ".csv,.txt") {
+function showUploadPanel(button, accept = ".csv,.txt,.png") {
   const rect = button.getBoundingClientRect();
+
   upload.style.left = `${rect.left + rect.width / 2}px`;
   upload.style.top = `${rect.bottom}px`;
+
   fileInput.accept = accept;
-  supportText.textContent = `Supports: ${accept.split(",").map((format) => format.slice(1)).join(", ")}`;
+
+  supportText.textContent = `Supports: ${accept
+    .split(",")
+    .map((format) => format.slice(1))
+    .join(", ")}`;
+
   upload.classList.remove("hidden");
 }
 
@@ -39,10 +48,21 @@ importButton.addEventListener("click", (event) => {
   showUploadPanel(importButton);
 });
 
-importButtons.forEach((button) => button.addEventListener("click", (event) => {
-  event.stopPropagation();
-  showUploadPanel(button, button.classList.contains("import-csv") ? ".csv" : ".txt");
-}));
+importButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    let accept = ".txt";
+
+    if (button.classList.contains("import-csv")) {
+      accept = ".csv";
+    } else if (button.classList.contains("import-img")) {
+      accept = ".png";
+    }
+
+    showUploadPanel(button, accept);
+  });
+});
 
 document.addEventListener("click", (event) => {
   if (!upload.contains(event.target)) upload.classList.add("hidden");
@@ -58,7 +78,9 @@ fileInput.addEventListener("change", () => {
   const reader = new FileReader();
   if (!file) return;
   const extension = `.${file.name.split(".").pop().toLowerCase()}`;
-  const allowedExtensions = fileInput.accept.split(",").map((item) => item.trim());
+  const allowedExtensions = fileInput.accept
+    .split(",")
+    .map((item) => item.trim());
   if (!allowedExtensions.includes(extension)) {
     alert(`รองรับเฉพาะ: ${allowedExtensions.join(", ")}`);
     fileInput.value = "";
@@ -74,7 +96,8 @@ fileInput.addEventListener("change", () => {
   reader.onload = (event) => {
     fillingFilePreview = true;
     txtArea.value = event.target.result;
-    txtArea.placeholder = "To mask data for PDPA, enter, paste or import file here and press “Mask”.";
+    txtArea.placeholder =
+      "To mask data for PDPA, enter, paste or import file here and press “Mask”.";
     txtArea.dispatchEvent(new Event("input"));
     fillingFilePreview = false;
   };
@@ -85,11 +108,21 @@ fileInput.addEventListener("change", () => {
     alert("ไม่สามารถอ่านไฟล์เพื่อแสดงตัวอย่างได้");
   };
 
+  if (extension === ".png") {
+    txtArea.value = "";
+    txtArea.placeholder =
+      `เลือกไฟล์ภาพ "${file.name}" แล้ว กด Mask เพื่ออ่านข้อความจากรูป`;
+    updateInputState();
+    return;
+  }
+
   reader.readAsText(file, "UTF-8");
 });
 
 txtArea.addEventListener("input", () => {
-  if (txtArea.value.trim()) txtArea.placeholder = "To mask data for PDPA, enter, paste or import file here and press “Mask”.";
+  if (txtArea.value.trim())
+    txtArea.placeholder =
+      "To mask data for PDPA, enter, paste or import file here and press “Mask”.";
   updateInputState();
 });
 
@@ -106,7 +139,8 @@ clearIcon.addEventListener("click", () => {
   txtArea.value = "";
   selectedFile = null;
   fileInput.value = "";
-  txtArea.placeholder = "To mask data for PDPA, enter, paste or import file here and press “Mask”.";
+  txtArea.placeholder =
+    "To mask data for PDPA, enter, paste or import file here and press “Mask”.";
   txtArea.dispatchEvent(new Event("input"));
   txtArea.focus();
 });
@@ -137,8 +171,14 @@ maskButton.addEventListener("click", async () => {
   });
 });
 
-["dragenter", "dragover"].forEach((eventName) => upload.addEventListener(eventName, () => upload.classList.add("drag-over")));
-["dragleave", "drop"].forEach((eventName) => upload.addEventListener(eventName, () => upload.classList.remove("drag-over")));
+["dragenter", "dragover"].forEach((eventName) =>
+  upload.addEventListener(eventName, () => upload.classList.add("drag-over")),
+);
+["dragleave", "drop"].forEach((eventName) =>
+  upload.addEventListener(eventName, () =>
+    upload.classList.remove("drag-over"),
+  ),
+);
 
 upload.addEventListener("drop", (event) => {
   const file = event.dataTransfer.files[0];
