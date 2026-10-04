@@ -180,8 +180,8 @@ fileInput.addEventListener("change", () => {
 
   if (!file) return;
   const extension = `.${file.name.split(".").pop().toLowerCase()}`;
-  if (![".txt", ".csv"].includes(extension)) {
-    alert("ขณะนี้รองรับไฟล์ .txt และ .csv เท่านั้น");
+  if (![".txt", ".csv", ".png"].includes(extension)) {
+    alert("ขณะนี้รองรับไฟล์ .txt, .csv และ .png เท่านั้น");
     fileInput.value = "";
     return;
   }
@@ -206,6 +206,14 @@ fileInput.addEventListener("change", () => {
     fileInput.value = "";
     alert("ไม่สามารถอ่านไฟล์เพื่อแสดงตัวอย่างได้");
   };
+
+  if (extension === ".png") {
+    dataInput.value = "";
+    dataInput.placeholder = `เลือกไฟล์ภาพ "${file.name}" แล้ว กด Mask เพื่ออ่านข้อความจากรูป`;
+    autoResize(dataInput);
+    updateClearButton();
+    return;
+  }
 
   reader.readAsText(file, "UTF-8");
 });
