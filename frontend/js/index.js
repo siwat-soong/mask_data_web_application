@@ -1,283 +1,160 @@
-const txt_area = document.querySelector("textarea");
-
+const txtArea = document.querySelector(".text-input");
 const hug = document.querySelector(".hug");
-const clr = document.querySelector(".trash-icon");
-
-const paste_btn = document.querySelector(".bi-clipboard");
-const import_btn = document.querySelector(".bi-box-arrow-in-down");
-
-const import_buttons = document.querySelectorAll(".import-bat");
-
+const clearIcon = document.querySelector(".trash-icon");
+const pasteButton = document.querySelector(".bi-clipboard");
+const importButton = document.querySelector(".bi-box-arrow-in-down");
+const importButtons = document.querySelectorAll(".import-bat");
 const upload = document.querySelector(".upload");
-const support_text = document.querySelector(".support-txt");
-
-const file_input = document.querySelector("#file-input");
+const supportText = document.querySelector(".support-txt");
+const fileInput = document.querySelector("#file-input");
 const browse = upload.querySelector("a");
-const mask_button = document.querySelector(".control-btn > button");
+const maskButton = document.querySelector(".control-btn > button");
+const expandButton = document.querySelector(".bi-arrows-angle-expand").closest("a");
+let selectedFile = null;
+let fillingFilePreview = false;
 
-
-// ========================================
-// Upload Panel
-// ========================================
-
-function upload_panel(button, accept = ".csv,.txt,.png") {
-
-    const rect = button.getBoundingClientRect();
-
-    // Position panel under clicked button
-    upload.style.left = `${rect.left + rect.width / 2}px`;
-    upload.style.top = `${rect.bottom}px`;
-
-    // Set accepted file types
-    file_input.accept = accept;
-
-    // Update support text
-    const formats = accept
-        .split(",")
-        .map(format => format.replace(".", ""));
-
-    support_text.textContent = `Supports: ${formats.join(", ")}`;
-
-    // Show panel
-    upload.classList.remove("hidden");
+function updateInputState() {
+  const hasText = txtArea.value.trim() !== "";
+  hug.classList.toggle("hidden", hasText);
+  clearIcon.classList.toggle("hidden", !hasText);
+  if (hasText && !fillingFilePreview) selectedFile = null;
 }
 
+function showUploadPanel(button, accept = ".csv,.txt") {
+  const rect = button.getBoundingClientRect();
+  upload.style.left = `${rect.left + rect.width / 2}px`;
+  upload.style.top = `${rect.bottom}px`;
+  fileInput.accept = accept;
+  supportText.textContent = `Supports: ${accept.split(",").map((format) => format.slice(1)).join(", ")}`;
+  upload.classList.remove("hidden");
+}
 
-// ========================================
-// Main Import Icon
-// ========================================
+function setMaskButtonLoading(loading) {
+  maskButton.disabled = loading;
+  maskButton.textContent = loading ? "กำลังประมวลผล..." : "Mask";
+}
 
-import_btn.addEventListener("click", (event) => {
-
-    // Prevent document click from immediately hiding panel
-    event.stopPropagation();
-
-    // Allow CSV, TXT and PNG
-    upload_panel(import_btn, ".csv,.txt,.png");
-
+importButton.addEventListener("click", (event) => {
+  event.stopPropagation();
+  showUploadPanel(importButton);
 });
 
-
-// ========================================
-// Individual Import Buttons
-// ========================================
-
-import_buttons.forEach(button => {
-
-    button.addEventListener("click", (event) => {
-
-        // Prevent document click from hiding panel
-        event.stopPropagation();
-
-        let accept;
-
-        if (button.classList.contains("import-csv")) {
-
-            accept = ".csv";
-
-        }
-        else if (button.classList.contains("import-txt")) {
-
-            accept = ".txt";
-
-        }
-        else if (button.classList.contains("import-img")) {
-
-            accept = ".png";
-
-        }
-
-        upload_panel(button, accept);
-
-    });
-
-});
-
-
-// ========================================
-// Click Outside Upload Panel
-// ========================================
+importButtons.forEach((button) => button.addEventListener("click", (event) => {
+  event.stopPropagation();
+  showUploadPanel(button, button.classList.contains("import-csv") ? ".csv" : ".txt");
+}));
 
 document.addEventListener("click", (event) => {
-
-    // If click is inside upload panel, do nothing
-    if (upload.contains(event.target)) {
-        return;
-    }
-
-    // Otherwise hide panel
-    upload.classList.add("hidden");
-
+  if (!upload.contains(event.target)) upload.classList.add("hidden");
 });
-
-
-// ========================================
-// Browse
-// ========================================
 
 browse.addEventListener("click", (event) => {
-
-    event.preventDefault();
-
-    file_input.click();
-
+  event.preventDefault();
+  fileInput.click();
 });
 
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  if (!file) return;
+  const extension = `.${file.name.split(".").pop().toLowerCase()}`;
+  const allowedExtensions = fileInput.accept.split(",").map((item) => item.trim());
+  if (!allowedExtensions.includes(extension)) {
+    alert(`รองรับเฉพาะ: ${allowedExtensions.join(", ")}`);
+    fileInput.value = "";
+    return;
+  }
 
-// ========================================
-// File Selected & Validation
-// ========================================
+  selectedFile = file;
+  txtArea.value = "";
+  txtArea.placeholder = `เลือกไฟล์ "${file.name}" แล้ว กด Mask เพื่อดำเนินการ`;
+  updateInputState();
+  upload.classList.add("hidden");
 
-file_input.addEventListener("change", () => {
-    const file = file_input.files[0];
+  reader.onload = (event) => {
+    fillingFilePreview = true;
+    txtArea.value = event.target.result;
+    txtArea.placeholder = "To mask data for PDPA, enter, paste or import file here and press “Mask”.";
+    txtArea.dispatchEvent(new Event("input"));
+    fillingFilePreview = false;
+  };
 
-    if (!file) {
-        return;
-    }
+  reader.onerror = () => {
+    selectedFile = null;
+    fileInput.value = "";
+    alert("ไม่สามารถอ่านไฟล์เพื่อแสดงตัวอย่างได้");
+  };
 
-    // 1. ดึงนามสกุลไฟล์ที่เลือก
-    const fileExtension = "." + file.name.split(".").pop().toLowerCase();
-
-    // 2. ดึงประเภทไฟล์ที่ยอมรับจาก accept
-    const allowedExtensions = file_input.accept
-        ? file_input.accept.split(",").map(ext => ext.trim().toLowerCase())
-        : [];
-
-    // 3. ตรวจสอบประเภทไฟล์
-    if (allowedExtensions.length > 0 && !allowedExtensions.includes(fileExtension)) {
-
-        // ❌ แจ้งเตือนไฟล์ผิดประเภท
-        alert(`❌ นามสกุลไฟล์ไม่ถูกต้อง!\nรองรับเฉพาะ: ${allowedExtensions.join(", ")}`);
-
-        // ล้างค่าไฟล์ที่ไม่ถูกต้องออก
-        file_input.value = "";
-        return;
-    }
-
-    // ✅ แจ้งเตือนอัปโหลดสำเร็จ
-    alert(`✅ อัปโหลดไฟล์ "${file.name}" เรียบร้อยแล้ว!`);
-
-    console.log("Selected file:", file.name);
-    console.log("File type:", file.type);
-
-    // ซ่อน upload panel เมื่อเลือกไฟล์สำเร็จ
-    upload.classList.add("hidden");
-
-    // Process file here later
+  reader.readAsText(file, "UTF-8");
 });
 
-
-// ========================================
-// Textarea
-// ========================================
-
-txt_area.addEventListener("input", () => {
-
-    if (txt_area.value.trim() !== "") {
-
-        hug.classList.add("hidden");
-
-        import_btn.classList.add("hidden");
-
-        clr.classList.remove("hidden");
-
-    }
-    else {
-
-        clr.classList.add("hidden");
-
-        hug.classList.remove("hidden");
-
-        import_btn.classList.remove("hidden");
-
-    }
-
+txtArea.addEventListener("input", () => {
+  if (txtArea.value.trim()) txtArea.placeholder = "To mask data for PDPA, enter, paste or import file here and press “Mask”.";
+  updateInputState();
 });
 
-
-// ========================================
-// Paste
-// ========================================
-
-paste_btn.addEventListener("click", async () => {
-
-    const text = await navigator.clipboard.readText();
-
-    txt_area.value = text;
-
-    // Trigger textarea UI update
-    txt_area.dispatchEvent(new Event("input"));
-
+pasteButton.addEventListener("click", async () => {
+  try {
+    txtArea.value = await navigator.clipboard.readText();
+    txtArea.dispatchEvent(new Event("input"));
+  } catch {
+    alert("ไม่สามารถอ่านข้อมูลจากคลิปบอร์ดได้");
+  }
 });
 
-
-// ========================================
-// Clear
-// ========================================
-
-clr.addEventListener("click", () => {
-
-    txt_area.value = "";
-
-    // Trigger textarea UI update
-    txt_area.dispatchEvent(new Event("input"));
-
+clearIcon.addEventListener("click", () => {
+  txtArea.value = "";
+  selectedFile = null;
+  fileInput.value = "";
+  txtArea.placeholder = "To mask data for PDPA, enter, paste or import file here and press “Mask”.";
+  txtArea.dispatchEvent(new Event("input"));
+  txtArea.focus();
 });
 
-// ========================================
-// Open Mask Workspace
-// ========================================
+maskButton.addEventListener("click", async () => {
+  const text = txtArea.value.trim();
+  if (!text && !selectedFile) {
+    alert("กรุณากรอกข้อความหรือเลือกไฟล์ก่อนกด Mask");
+    return;
+  }
 
-mask_button.addEventListener("click", () => {
-
-    if (txt_area.value.trim() === "") {
-        alert("กรุณากรอกข้อความก่อนกด Mask");
-        return;
-    }
-
-    sessionStorage.setItem("maskInputText", txt_area.value);
+  setMaskButtonLoading(true);
+  try {
+    const result = await requestMask({ text, file: selectedFile });
+    saveMaskResult(result);
     window.location.href = "render.html";
-
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    setMaskButtonLoading(false);
+  }
 });
 
-// ========================================
-// Drag and Drop
-// ========================================
-
-// 1. ป้องกันไม่ให้ Browser เปิดไฟล์ขึ้นมาเองเมื่อมี Event เกี่ยวกับการลากวาง
-["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
-    upload.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-    });
+["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+  upload.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  });
 });
 
-// 2. ใส่/เอา Class ออกเมื่อลากไฟล์มาอยู่เหนือกล่อง (สำหรับทำ UI ให้รู้ว่ากำลังลากใส่)
-["dragenter", "dragover"].forEach(eventName => {
-    upload.addEventListener(eventName, () => {
-        upload.classList.add("drag-over");
-    });
-});
+["dragenter", "dragover"].forEach((eventName) => upload.addEventListener(eventName, () => upload.classList.add("drag-over")));
+["dragleave", "drop"].forEach((eventName) => upload.addEventListener(eventName, () => upload.classList.remove("drag-over")));
 
-["dragleave", "drop"].forEach(eventName => {
-    upload.addEventListener(eventName, () => {
-        upload.classList.remove("drag-over");
-    });
-});
-
-// 3. เมื่อปล่อยไฟล์ (Drop)
 upload.addEventListener("drop", (event) => {
-    const files = event.dataTransfer.files;
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  const transfer = new DataTransfer();
+  transfer.items.add(file);
+  fileInput.files = transfer.files;
+  fileInput.dispatchEvent(new Event("change"));
+});
 
-    if (files.length === 0) return;
+expandButton.addEventListener("click", () => {
+  const text = txtArea.value;
 
-    // อัปเดตไฟล์ที่ได้เข้าไปใน 
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(files[0]);
-    file_input.files = dataTransfer.files;
-
-    // สั่งยิง Event 'change' เพื่อให้โค้ด File Selected เดิมทำงานต่อ
-    file_input.dispatchEvent(new Event("change"));
-
-    upload.classList.add("hidden");
+  if (text.trim()) {
+    sessionStorage.setItem("maskInputText", text);
+  } else {
+    sessionStorage.removeItem("maskInputText");
+  }
 });

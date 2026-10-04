@@ -1,0 +1,11 @@
+MaskData test file (fictional data only)
+
+Customer: Somchai Example
+Email: somchai.example@demo.test
+Phone: 081-234-5678
+Credit card: 4111-1111-1111-1111
+DOB: 15/08/1995
+Address: 123/45 ถนนสุขุมวิท กรุงเทพฯ
+
+This line intentionally has a phone number in an invalid format for testing:
+Possible phone: 0812345678
