@@ -10,17 +10,20 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css" />
   </head>
 
   <body>
     <main class="app">
       <!-- Logo -->
-      <a href="index.html">
         <header class="header">
-          <img src="img/toc_logo.svg" alt="MaskDotex" class="logo" />
+          <a href="index.html" class="logo-link">
+            <img src="img/toc_logo.svg" alt="MaskDotex" class="logo" />
+          </a>
         </header>
-      </a>
 
       <!-- Main workspace -->
       <section class="workspace">
@@ -54,12 +57,15 @@
               </button>
 
               <span class="or-text">or</span>
-
-              <div class="import-area">
+            
+            <div class="import-buttom">
                 <button class="action-button" id="import-button">
                   <img src="img/import.svg" alt="import" class="import-icon" />
                   Import file
                 </button>
+            </div>
+
+              <div class="import-area">
 
                 <div class="upload-box" id="upload-box">
                   <div class="upload-inner">

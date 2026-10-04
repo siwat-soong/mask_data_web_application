@@ -26,6 +26,12 @@ let downloadedFileName = "masked-data.txt";
 let selectedFile = null;
 let fillingFilePreview = false;
 
+["dragover", "drop"].forEach((eventName) => {
+  window.addEventListener(eventName, (event) => {
+    event.preventDefault();
+  });
+});
+
 function autoResize(textarea) {
   const maxHeight = 450;
 

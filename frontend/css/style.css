@@ -19,7 +19,7 @@ body {
 ========================= */
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
 
   min-height: 100vh;
   background: #f2f7f4;
@@ -29,7 +29,7 @@ body {
 
 .data-input,
 .masked-output {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
   font-size: 18px;
   font-weight: 400;
   line-height: 1.55;
@@ -81,6 +81,7 @@ body {
   flex: 1;
   min-height: 0;
 
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: 1fr 1fr;
 
@@ -92,6 +93,8 @@ body {
 
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
 }
+
+
 
 .data-input-wrapper {
   position: relative;
@@ -130,7 +133,6 @@ body {
 .clear-button img {
   width: 24px;
   height: 24px;
-  opacity: 0.7;
 }
 
 .clear-button:hover {
@@ -194,14 +196,14 @@ body {
   height: auto;
   min-height: 20px;
   max-height: 400px;
-  width: calc(100% - 52px);
-  max-width: calc(100% - 52px);
+  width: 100%;
+  max-width: 100%;
 
-  padding-right: 0px;
+  margin-right: 8px;
+  padding-right: 20px;
   margin-top: 20px;
 
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow-y: hidden;
 
   border: none;
   outline: none;
@@ -216,6 +218,7 @@ body {
   box-sizing: border-box;
   word-break: normal;
   overflow-wrap: break-word;
+  right: 0;
 }
 
 /* Chrome / Edge / Safari */
@@ -247,7 +250,7 @@ body {
 
 .text-input.png-selected::placeholder,
 .data-input.png-selected::placeholder {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 1.55;
@@ -264,7 +267,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin-top: 15px;
+  margin: 0;
 }
 
 .action-button {
@@ -315,20 +318,15 @@ body {
 
 .upload-box {
   display: none;
-
   width: 100%;
-  max-width: 250px;
+  height: 100%;
 
-  height: 180px;
+  padding: 10px;
+  margin: 0;
 
-  margin-top: 17px;
-  padding: 18px;
-
-  border: 1.5px solid #4aa455;
-  border-radius: 20px;
-
+  border: 1px solid #4aa455;
+  border-radius: 16px;
   background: white;
-
   box-sizing: border-box;
 }
 
@@ -340,7 +338,7 @@ body {
   width: 100%;
   height: 100%;
 
-  padding: 15px;
+  padding: 8px;
   box-sizing: border-box;
 
   display: flex;
@@ -352,20 +350,23 @@ body {
   border-radius: 8px;
 }
 
-.import-area {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+.import-buttom {
+  position: relative;
+  display: inline-block;
+}
 
-  width: 100%;
-  max-width: 250px;
+.import-area {
+  position: absolute;
+  top: 205px;
+  left: 167px; 
+  width: 250px;
+  height: 180px;
+  box-sizing: border-box;
 }
 
 .import-area.drag-over {
-  outline: 2px dashed #2a8627;
-  outline-offset: 6px;
+  border: 3px solid #4aa455; 
   border-radius: 20px;
-  background: #f1faf2;
 }
 
 /* import-icon */
@@ -514,7 +515,7 @@ body {
 
 .mask-summary {
   margin: 0;
-  padding: 14px 0 14px 0;
+  padding: 8px 0 8px 0;
   border: none;
   color: #333;
   font-size: 18px;
@@ -611,7 +612,6 @@ body {
   justify-content: center;
 
   padding: 0;
-  border: 1px solid #2a8627;
   border-radius: 50%;
 
   background: #fff;
@@ -619,8 +619,10 @@ body {
 
   font-size: 28px;
   cursor: pointer;
-
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  outline: none;
+  border: none;
+  box-shadow: 0 0 8px 0.1px rgba(0, 0, 0, 0.4);
+  
 }
 
 .download-action:hover {
