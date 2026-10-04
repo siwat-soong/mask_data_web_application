@@ -210,6 +210,9 @@ fileInput.addEventListener("change", () => {
   if (extension === ".png") {
     dataInput.value = "";
     dataInput.placeholder = `เลือกไฟล์ภาพ "${file.name}" แล้ว กด Mask เพื่ออ่านข้อความจากรูป`;
+
+    dataInput.classList.add("png-selected");
+
     autoResize(dataInput);
     updateClearButton();
     return;
@@ -258,6 +261,7 @@ pasteButton.addEventListener("click", async () => {
 });
 
 dataInput.addEventListener("input", () => {
+  dataInput.classList.remove("png-selected");
   if (dataInput.value.trim() && !fillingFilePreview) {
     selectedFile = null;
     dataInput.placeholder =
@@ -268,6 +272,7 @@ dataInput.addEventListener("input", () => {
 });
 
 clearButton.addEventListener("click", () => {
+  dataInput.classList.remove("png-selected");
   dataInput.value = "";
   selectedFile = null;
   fileInput.value = "";
