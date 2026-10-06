@@ -725,3 +725,19 @@ body {
     margin: 0 24px 24px;
   }
 }
+
+.src-code {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.src-code p {
+    color: #9C9595;
+}
+
+.src-code a {
+    color: #2A8627;
+    text-decoration: none;
+}

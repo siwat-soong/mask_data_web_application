@@ -9,6 +9,12 @@
 body {
     width: 100vw;
     height: 100vh;
+    position: relative;
+}
+
+.ui {
+    width: 100%;
+    height: 100%;
     background-color: #F1F8F4;
     display: flex;
     justify-content: center;
@@ -284,4 +290,20 @@ body {
 .import-img i {
     color: #F29B18;
     background-color: #F29B1821;
+}
+
+.src-code {
+    position: absolute;
+    top: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.src-code p {
+    color: #9C9595;
+}
+
+.src-code a {
+    color: #2A8627;
+    text-decoration: none;
 }
