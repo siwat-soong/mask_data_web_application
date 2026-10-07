@@ -170,6 +170,10 @@ async function submitMask() {
 
 importButton.addEventListener("click", (event) => {
   event.stopPropagation();
+  if (window.matchMedia("(max-width: 480px)").matches) {
+    fileInput.click();
+    return;
+  }
   uploadBox.classList.toggle("show");
 });
 
@@ -366,7 +370,10 @@ maskedOutput.addEventListener("mouseover", (event) => {
 maskedOutput.addEventListener("mousemove", (event) => {
   if (errorTooltip.hidden) return;
 
-  errorTooltip.style.left = `${event.clientX}px`;
+  const tooltipWidth = errorTooltip.offsetWidth;
+  const minLeft = tooltipWidth / 2 + 8;
+  const maxLeft = window.innerWidth - tooltipWidth / 2 - 8;
+  errorTooltip.style.left = `${Math.min(Math.max(event.clientX, minLeft), maxLeft)}px`;
   errorTooltip.style.top = `${event.clientY - 16}px`;
 });
 

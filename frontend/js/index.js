@@ -35,8 +35,13 @@ function updateInputState() {
 function showUploadPanel(button, accept = ".csv,.txt,.png") {
   const rect = button.getBoundingClientRect();
 
-  upload.style.left = `${rect.left + rect.width / 2}px`;
   upload.style.top = `${rect.bottom}px`;
+  upload.classList.remove("hidden");
+
+  const panelWidth = upload.offsetWidth;
+  const minLeft = panelWidth / 2 + 8;
+  const maxLeft = window.innerWidth - panelWidth / 2 - 8;
+  upload.style.left = `${Math.min(Math.max(rect.left + rect.width / 2, minLeft), maxLeft)}px`;
 
   fileInput.accept = accept;
 
@@ -44,8 +49,6 @@ function showUploadPanel(button, accept = ".csv,.txt,.png") {
     .split(",")
     .map((format) => format.slice(1))
     .join(", ")}`;
-
-  upload.classList.remove("hidden");
 }
 
 function setMaskButtonLoading(loading) {
@@ -55,6 +58,11 @@ function setMaskButtonLoading(loading) {
 
 importButton.addEventListener("click", (event) => {
   event.stopPropagation();
+  if (window.matchMedia("(max-width: 480px)").matches) {
+    fileInput.accept = ".csv,.txt,.png";
+    fileInput.click();
+    return;
+  }
   showUploadPanel(importButton);
 });
 

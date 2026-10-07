@@ -30,7 +30,7 @@ body {
 .data-input,
 .masked-output {
   font-family: 'IBM Plex Sans Thai', 'IBM Plex Sans', sans-serif;
-  font-size: 18px;
+  font-size: clamp(14px, 4vw, 18px);
   font-weight: 400;
   line-height: 1.55;
   letter-spacing: normal;
@@ -210,7 +210,7 @@ body {
   resize: none;
 
   font-family: inherit;
-  font-size: 18px;
+  font-size: clamp(14px, 4vw, 18px);
 
   background: transparent;
   transition: height 0.15s ease;
@@ -259,7 +259,7 @@ body {
 }
 
 .data-input::placeholder {
-  font-size: 18px;
+  font-size: clamp(14px, 4vw, 18px);
   color: #9c9595;
 }
 
@@ -274,10 +274,13 @@ body {
   display: inline-flex;
 
   align-items: center;
+  justify-content: center;
 
   gap: 6px;
 
-  padding: 6px 14px;
+  width: 165px;
+  height: 38px;
+  padding: 0 14px;
 
   border: 1px solid #2a8627;
 
@@ -357,9 +360,11 @@ body {
 
 .import-area {
   position: absolute;
-  top: 205px;
-  left: 167px; 
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
   width: 250px;
+  max-width: calc(100vw - 32px);
   height: 180px;
   box-sizing: border-box;
 }
@@ -726,6 +731,61 @@ body {
   }
 }
 
+@media (max-width: 480px) {
+  .logo {
+    width: 110px;
+  }
+
+  .input-actions {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .action-button {
+    width: auto;
+    padding: 0 10px;
+    font-size: 14px;
+    gap: 5px;
+  }
+
+  .action-button span {
+    font-size: 14px;
+  }
+
+  .paste-icon,
+  .import-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .or-text {
+    font-size: 16px;
+    margin-top: 0;
+  }
+
+  .panel-body {
+    padding: 0 12px 20px 12px;
+  }
+
+  .mask-area {
+    padding-left: 16px;
+  }
+
+  .mask-button {
+    height: 34px;
+    min-width: 90px;
+    padding: 0 16px;
+    font-size: 15px;
+  }
+
+  .download-action {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+  }
+}
+
 .src-code {
     position: absolute;
     top: 0;
@@ -740,4 +800,15 @@ body {
 .src-code a {
     color: #2A8627;
     text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .src-code {
+    position: static;
+    transform: none;
+    width: 100%;
+    padding: 12px 16px 0;
+    text-align: center;
+    font-size: 13px;
+  }
 }
