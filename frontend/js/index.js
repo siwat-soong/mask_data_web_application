@@ -12,8 +12,18 @@ const maskButton = document.querySelector(".control-btn > button");
 const expandButton = document
   .querySelector(".bi-arrows-angle-expand")
   .closest("a");
+const introModal = document.querySelector("#intro-modal");
+const introModalClose = document.querySelector("#intro-modal-close");
 let selectedFile = null;
 let fillingFilePreview = false;
+
+if (!localStorage.getItem("maskdata_intro_seen")) {
+  introModal.classList.remove("hidden");
+}
+introModalClose.addEventListener("click", () => {
+  introModal.classList.add("hidden");
+  localStorage.setItem("maskdata_intro_seen", "true");
+});
 
 function updateInputState() {
   const hasText = txtArea.value.trim() !== "";

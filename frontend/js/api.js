@@ -1,4 +1,4 @@
-const MASK_API_URL = "http://127.0.0.1:8000";
+const MASK_API_URL = window.location.protocol === "file:" ? "http://127.0.0.1:8000" : "";
 
 async function requestMask({ text, file }) {
   const url = file ? `${MASK_API_URL}/api/mask/file` : `${MASK_API_URL}/api/mask`;

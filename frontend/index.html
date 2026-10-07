@@ -60,7 +60,36 @@
         </div>
     </div>
 
-    <input type="file" id="file-input" hidden>  
+    <div id="intro-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>ข้อมูลประเภทใดบ้างที่จะถูกปิดบัง</h2>
+            <ul class="modal-type-list">
+                <li>
+                    <span class="modal-type-label">เบอร์โทรศัพท์</span>
+                    <span class="modal-type-example">093-245-7894 <i class="bi bi-arrow-right"></i> XXX-XXX-7894</span>
+                </li>
+                <li>
+                    <span class="modal-type-label">อีเมล</span>
+                    <span class="modal-type-example">john.doe@example.com <i class="bi bi-arrow-right"></i> j******e@example.com</span>
+                </li>
+                <li>
+                    <span class="modal-type-label">ที่อยู่</span>
+                    <span class="modal-type-example">Address: 123/4 <i class="bi bi-arrow-right"></i> Address: XXX/X</span>
+                </li>
+                <li>
+                    <span class="modal-type-label">บัตรเครดิต</span>
+                    <span class="modal-type-example">1234-5678-9012-3456 <i class="bi bi-arrow-right"></i> XXXX-XXXX-XXXX-3456</span>
+                </li>
+                <li>
+                    <span class="modal-type-label">วันเกิด</span>
+                    <span class="modal-type-example">DOB: 15/03/1990 <i class="bi bi-arrow-right"></i> DOB: XX/XX/19XX</span>
+                </li>
+            </ul>
+            <button id="intro-modal-close" class="modal-close-btn">เข้าใจแล้ว</button>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" hidden>
     <script src="./js/api.js"></script>
     <script src="./js/index.js"></script>
 </body>
