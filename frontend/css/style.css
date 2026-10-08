@@ -195,7 +195,7 @@ body {
 .data-input {
   height: auto;
   min-height: 20px;
-  max-height: 400px;
+  max-height: 500px;
   width: 100%;
   max-width: 100%;
 
@@ -262,6 +262,7 @@ body {
   font-size: clamp(14px, 4vw, 18px);
   color: #9c9595;
 }
+
 
 .input-actions {
   display: flex;
@@ -482,7 +483,7 @@ body {
   max-width: calc(100% - 60px);
 
   min-height: 220px;
-  max-height: 560px;
+  max-height: 500px;
 
   margin-top: 20px;
 

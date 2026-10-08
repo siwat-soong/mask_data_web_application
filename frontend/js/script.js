@@ -48,6 +48,11 @@ function updateClearButton() {
   const hasText = dataInput.value.trim() !== "";
   clearButton.style.display = hasText ? "flex" : "none";
   inputActions.style.display = hasText ? "none" : "flex";
+
+  if (!hasText){
+    maskedOutput.textContent = "";
+    maskSummary.textContent = "";
+  }
 }
 
 function setMaskButtonLoading(loading) {
@@ -60,6 +65,7 @@ function renderMaskedResult(result) {
   autoResize(dataInput);
   updateClearButton();
   maskedOutput.replaceChildren();
+  
 
   const labels = {
     dob: "DOB",
